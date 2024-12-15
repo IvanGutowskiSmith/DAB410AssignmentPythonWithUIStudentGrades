@@ -1,5 +1,6 @@
 import pandas as pd
-#import datetime # Used for testing remove later when not needed
+import numpy as np
+import datetime # Used for testing remove later when not needed
 #print(datetime.datetime.now())
 
 dataFrame = pd.read_csv('student_grades.csv')
@@ -9,6 +10,9 @@ pd.set_option('display.max_columns', None)
 # Global Variables
 TOTAL_STUDENT_COUNT = len(dataFrame) # Populate total student count on application start
 GRADE_PASS_BOUNDARY = 40 # >= 40 is a pass
+GRADE_A_MINIMUM = 70 # greater than or eq to
+GRADE_B_MINIMUM = 60 # eq or greater than 60, less than 70
+GRADE_C_MINIMUM = 50
 
 print("Total Student count: "+ str(TOTAL_STUDENT_COUNT))
 
@@ -33,6 +37,16 @@ print("Total Pass: ", str(runningTotalPassCount))
 print("Total Fail: ",str(runningTotalFailCount))
 
 
+# Calculating grade count A,B,C
+
+df = dataFrame["grade"]
+aTrues = (df >= GRADE_A_MINIMUM) # Could validate upper limit, however known presumptions are that grades cannot exceed 100%
+bTrues = (df >= GRADE_B_MINIMUM) & (df < GRADE_A_MINIMUM) # Greater or eq 60, less than 70
+cTrues = (df >= GRADE_C_MINIMUM) & (df < GRADE_B_MINIMUM) # Greater or eq 50, less than 60
+
+print("Grade A count: ",np.count_nonzero(aTrues))
+print("Grade B count: ",np.count_nonzero(bTrues))
+print("Grade C count: ",np.count_nonzero(cTrues))
 
 
 

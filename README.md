@@ -1,6 +1,7 @@
 -- Required modules: / Prerequisites
 
 -- Pandas python package via pycharm, selelect latest version
+-- numpy
 
 -- need git
 
