@@ -12,7 +12,7 @@ GRADE_PASS_BOUNDARY = 40 # => 40 is a pass
 print("Total Student count: "+ str(TOTAL_STUDENT_COUNT))
 
 averageAttendance = dataFrame["attendance"].mean() # Using Panda's built in mean average to calculate result, restricted to desired column for attendance
-print("Average attendance is:",str(round(dataFrame["grade"].mean(),2)),"%") # Panda to average column 'grade', round to two significant figures, convert, concatenate within a string to print
+print("Average grade is:",str(round(dataFrame["grade"].mean(),2)),"%") # Panda to average column 'grade', round to two significant figures, convert, concatenate within a string to print
 
 
 # Count pass / fails
