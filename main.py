@@ -1,5 +1,6 @@
 import pandas as pd
-import numpy as np
+import numpy as np # np is alias, not needed but this is best practice
+import tkinter as tk
 import datetime # Used for testing remove later when not needed
 #print(datetime.datetime.now())
 
