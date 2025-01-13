@@ -10,39 +10,142 @@ from tkinter import ttk
 
 
 # Setup UI
-window = tk.Tk()
-window.title('Student Grade Manager')
-window.geometry('1280x720') # 16:9 aspect ratio that should fit on most screens
-
+root = tk.Tk()
+root.geometry('1280x720') # 16:9 aspect ratio that should fit on most screens
+root.minsize(640,360)
+root.title('Student Grade Manager. Student ID: 2310700')
 appFont = 'Calibri'
 
-# Main packs
-left_filter_pane = ttk.Frame(master = window)
-center_results_pane = ttk.Frame(master = window)
-right_student_info_pane = ttk.Frame(master = window)
 
-# Main pack layouts
-left_filter_pane.pack(side = 'left')
+# Main layout widgets
+menu_frame = ttk.Frame(root)
+main_frame_left = ttk.Frame(root)
+main_frame_centre = ttk.Frame(root)
+main_frame_right = ttk.Frame(root)
 
-# Title text
-stats_Summary = ttk.Label(master = window, text = 'Student Grade Summaries', font = appFont,borderwidth=2, relief='groove') # Label widget, can add size and bold to appFont
-stats_Summary.pack()
+# Place main layout
+menu_frame.place(x = 0,y = 0, relwidth = 1, height = 25)
+main_frame_left.place(x = 0,y = 25, relwidth = 0.25, relheight = 1)
+main_frame_centre.place(relx = 0.25,y = 25, relwidth = 0.5, relheight = 1)
+main_frame_right.place(relx = 0.75,y = 25, relwidth = 0.25, relheight = 1)
 
-# Student search
-search_frame = ttk.Frame(master = left_filter_pane) # Creating frame for search box widgets
-search_box = ttk.Entry(master = search_frame) # lives inside the search frame, 'Entry' used as it's single line and not multiline input
-search_button = ttk.Button(master = search_frame, text = 'Search')
-# Student search layout
+ttk.Label(menu_frame, background = 'red').pack(expand = True, fill = 'both')
+ttk.Label(main_frame_left, background = 'green').pack(expand = True, fill = 'both')
+ttk.Label(main_frame_centre, background = 'grey').pack(expand = True, fill = 'both')
+ttk.Label(main_frame_right, background = 'blue').pack(expand = True, fill = 'both')
 
-search_frame.pack(side = 'top') # Higher level pack that contains below search box and search button
-search_box.pack(side = 'left', padx = 10) # Side argument places both on same line
-search_button.pack(side = 'left', padx = 5) # Pad puts gap on x axis to space between search box and button
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#root.columnconfigure(0, weight=1, uniform = 'a') # index, weight, uniformity ensures equal column widths
+#root.columnconfigure(1, weight=2, uniform = 'a')
+#root.columnconfigure(2, weight=1, uniform = 'a')
+#root.rowconfigure(0, weight=1,minsize = 25)
+#root.rowconfigure(1, weight=20, uniform = 'b')
+#
+## Add a Frame widget
+#frame = tk.Frame(root, bg = 'Green')
+#
+#label_1 = ttk.Label(frame, background = 'black', text = 'Menu')
+#label_1.grid(column=0, row=0, sticky='NEWS', columnspan = 1)
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#label_Top_Menu = ttk.Label(root, background = 'darkRed', text = 'Menu')
+#label_Top_Menu.grid(column=0, row=0, sticky='NEWS', columnspan = 3)
+#
+#label_LeftFilters = ttk.Label(root, background = 'darkGreen', text = 'Left Menu')
+#label_LeftFilters.grid(column=0, row=1, sticky='NEWS')
+#
+#label_Central_Results = ttk.Label(root, background = 'lightBlue', text = 'Central Results')
+#label_Central_Results.grid(column=1, row=1, sticky='NEWS')
+#
+#label_Right_Student_Info = ttk.Label(root, background = 'lightGreen', text = 'Student Info')
+#label_Right_Student_Info.grid(column=2, row=1, sticky='NEWS')
+#
+#
+## Layout inside a frame
+#search_frame = ttk.Frame(root)
+#search_frame.columnconfigure(0, weight=1, uniform = 'a')
+#search_frame.columnconfigure(1, weight=1, uniform = 'a')
+#search_frame.rowconfigure(0, weight=1, uniform = 'b')
+#
+#search_Box = ttk.Label(search_frame, background = 'Grey', text = 'Search Box')
+#search_Box.grid(column=2, row=1, sticky='NEWS')
+#
+#
+#label_LeftFilters.columnconfigure(0, weight=1, uniform = 'a')
+#label_LeftFilters.columnconfigure(1, weight=1, uniform = 'a')
+#root.rowconfigure(0, weight=1, uniform = 'b')
+#
+#search_Box = ttk.Label(label_LeftFilters, background = 'Grey', text = 'Search Box')
+#
+#
+
+
+# root.columnconfigure(0, weight=1, uniform = 'a') # index, weight, uniformity ensures equal column widths
+# root.columnconfigure(1, weight=2, uniform = 'a')
+# root.columnconfigure(2, weight=1, uniform = 'a')
+# root.rowconfigure((0,1,2,3), weight=1, uniform = 'b') # Can use tuple to save duplicate lines of code, 4 rows created
+
+
+# Frame for student search
+#searchLabelFrame = ttk.LabelFrame(root,text='Search label Frame') # Frame to contain search elements
+#.grid(column=0,row=0,sticky = 'NEWS') # place frame in grid
+# Search box
+#search_entry = ttk.Entry(root) #creating single line text entry box, with searchLabelFrame as parent
+#search_entry.grid(column=0,row=0,sticky = 'we')
+# Search btn
+#search_btn = ttk.Button(root, text='Search for student')
+#search_btn.grid(column=0,row=0,sticky = 'e',padx = 5)
 
 
 
 
 # Run UI
-window.mainloop()
+root.mainloop()
 
 
 
