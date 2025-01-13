@@ -20,19 +20,44 @@ appFont = 'Calibri'
 # Main layout widgets
 menu_frame = ttk.Frame(root)
 main_frame_left = ttk.Frame(root)
+main_frame_left_search = ttk.Frame(main_frame_left)
 main_frame_centre = ttk.Frame(root)
 main_frame_right = ttk.Frame(root)
 
-# Place main layout
+# Place main layout (Single fixed menu frame along top, main frame divided into 3 columns L:25%, C:50%, R:25%
 menu_frame.place(x = 0,y = 0, relwidth = 1, height = 25)
 main_frame_left.place(x = 0,y = 25, relwidth = 0.25, relheight = 1)
 main_frame_centre.place(relx = 0.25,y = 25, relwidth = 0.5, relheight = 1)
 main_frame_right.place(relx = 0.75,y = 25, relwidth = 0.25, relheight = 1)
 
 ttk.Label(menu_frame, background = 'red').pack(expand = True, fill = 'both')
-ttk.Label(main_frame_left, background = 'green').pack(expand = True, fill = 'both')
-ttk.Label(main_frame_centre, background = 'grey').pack(expand = True, fill = 'both')
-ttk.Label(main_frame_right, background = 'blue').pack(expand = True, fill = 'both')
+#ttk.Label(main_frame_left, background = 'green').pack(expand = True, fill = 'both')
+#ttk.Label(main_frame_centre, background = 'grey').pack(expand = True, fill = 'both')
+#ttk.Label(main_frame_right, background = 'blue').pack(expand = True, fill = 'both')
+
+# Left column frames
+main_frame_left_search.place(x = 0,y = 0, relwidth = 1, relheight = 0.1)
+#ttk.Label(main_frame_left_search, background = 'pink').pack(expand = True, fill = 'both')
+
+#Left grid frames
+#widgets
+left_menu_search_textEntry = ttk.Entry(main_frame_left_search)
+left_menu_search_btn = ttk.Button(main_frame_left_search,text = 'Search')
+
+# Student Search frame
+main_frame_left_search.columnconfigure(0, weight =2)
+main_frame_left_search.columnconfigure(1, weight = 1)
+main_frame_left_search.rowconfigure(0,weight = 1)
+
+left_menu_search_textEntry.grid(row=0,column=0, sticky = 'ew', padx = 5)
+left_menu_search_btn.grid(row=0,column=1)
+
+# Stats Summary frame
+
+# Summary charts frame
+
+
+
 
 
 
