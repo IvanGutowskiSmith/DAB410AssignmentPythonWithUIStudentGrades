@@ -8,7 +8,6 @@ from tkinter import ttk
 #import datetime # Used for testing remove later when not needed
 #print(datetime.datetime.now())
 
-
 ##########################LOGIC
 
 # Import file / logic
@@ -24,6 +23,8 @@ GRADE_A_MINIMUM = 70 # greater than or eq to
 GRADE_B_MINIMUM = 60 # eq or greater than 60, less than 70
 GRADE_C_MINIMUM = 50
 
+COLUMN_TITLES = tuple(dataFrame.columns) # Dynamically extract column titles from data file
+
 print("Total Student count: "+ str(TOTAL_STUDENT_COUNT))
 
 AVERAGE_ATTENDANCE = round(dataFrame["attendance"].mean(),2) # Using Panda's built in mean average to calculate result, rounded
@@ -33,8 +34,6 @@ print("Average grade is:",str(AVERAGE_GRADE),"%") # Panda to average column 'gra
 # Count pass / fails
 runningTotalPassCount = int() # Declare empty variable, 'none' would cause error, considered using zero however, may hide errors as program would run
 runningTotalFailCount = int()
-
-
 
 for index,row in dataFrame.iterrows():
     rowGrade = row['grade'] # Could combine this into if statement, however easier to debug if value is extracted to variable before being compared
@@ -93,12 +92,17 @@ main_frame_left_bottom = ttk.Frame(main_frame_left)
 main_frame_centre = ttk.Frame(root)
 
 main_frame_right = ttk.Frame(root)
+main_frame_right_top = ttk.Frame(main_frame_right)
+main_frame_right_middle = ttk.Frame(main_frame_right)
+main_frame_right_bottom = ttk.Frame(main_frame_right)
+
+topMenuHeight = 25
 
 # Place main layout (Single fixed menu frame along top, main frame divided into 3 columns L:25%, C:50%, R:25%
-menu_banner_frame.place(x = 0,y = 0, relwidth = 1, height = 25)
-main_frame_left.place(x = 0,y = 25, relwidth = 0.2, relheight = 1)
-main_frame_centre.place(relx = 0.2,y = 25, relwidth = 0.6, relheight = 1)
-main_frame_right.place(relx = 0.8,y = 25, relwidth = 0.2, relheight = 1)
+menu_banner_frame.place(x = 0,y = 0, relwidth = 1, height = topMenuHeight)
+main_frame_left.place(x = 0,y = topMenuHeight, relwidth = 0.2, relheight = 1)
+main_frame_centre.place(relx = 0.2,y = topMenuHeight, relwidth = 0.6, relheight = 1)
+main_frame_right.place(relx = 0.8,y = topMenuHeight, relwidth = 0.2, relheight = 1)
 
 ttk.Label(menu_banner_frame, background = 'red').pack(expand = True, fill = 'both')
 #ttk.Label(main_frame_left, background = 'green').pack(expand = True, fill = 'both')
@@ -176,25 +180,17 @@ ttk.Label(main_frame_left_bottom, background = 'lightBlue').pack(expand = True, 
 
 # TODO Possibly have columns created dynamically from the data file, may avoid errors this way if a column name is edited, order changed or removed
 
-columns = ('studentId', 'firstName', 'lastName', 'age', 'email', 'country', 'attendance', 'assignmentCompleted', 'grade')
-table = ttk.Treeview(main_frame_centre, columns=columns, show='headings')
+table = ttk.Treeview(main_frame_centre, columns=COLUMN_TITLES, show='headings')
 
 # Adjust column widths and alight text to centre
-for col in columns:
+for col in COLUMN_TITLES:
     table.column(col, minwidth=30, width=90, anchor='center')
-table.column('studentId',width=30) #Made ID and age columns narrower
+table.column('student_id',width=60) #Made ID and age columns narrower
 table.column('age',width=30)
 
 # Adding column titles to table
-table.heading('studentId',text = 'Id')
-table.heading('firstName',text = 'First Name')
-table.heading('lastName',text = 'Last Name')
-table.heading('age',text = 'Age')
-table.heading('email',text = 'Email')
-table.heading('country',text = 'Country')
-table.heading('attendance',text = 'Attendance %')
-table.heading('assignmentCompleted',text = 'Assignment Completed?')
-table.heading('grade',text = 'Grade')
+for title in COLUMN_TITLES:
+    table.heading(title,text = title)
 table.pack(expand = True, fill = 'both')
 
 # Add values into Treeview table
@@ -212,12 +208,7 @@ for index,row in dataFrame.iterrows():
     studentData = (student_id,first_name,last_name,age,email,country,attendance,assignmentCompleted,grade)
     table.insert(parent = '', index = student_id, values = studentData) # Using student ID as the row index as it keeps order logical and value is unique
 
-# Table selection event
-def clicked_item(_): # Underscore means we do not care abut the value
-    row_ids = table.selection()
-    print(row_ids[0]) # Select only first tuple ID if multiple are selected with shift + click
-    print(table.item(row_ids[0])['values']) # Print data from row to console
-table.bind('<<TreeviewSelect>>',clicked_item)
+
 
 
 # TODO add scroll bar, top menu and print student results to right hand side. Possibly edit values or atleast delete student
@@ -228,7 +219,43 @@ table.bind('<<TreeviewSelect>>',clicked_item)
 #table.insert(parent = '',index = 0,values = ('118','Bob','Bobbins','22','bob@email.com','England','98','True','56')) # Parent is empty string as there are no sub items, the table starts with '' as the default parent
 
 
-# Right frame
+## Right frame
+
+# Right Frame Logic
+studentSummaryTable = ttk.Treeview(main_frame_right_middle, columns=('col1','col2'),show='headings')
+
+# Table row selection event
+def clicked_student_update_summary_table(_): # Underscore means we do not care abut the value
+    row_id = table.selection()
+    print('Clicked row Id: ' + row_id[0]) # Select only first tuple ID if multiple are selected with shift + click
+    row_data = table.item(row_id[0])['values']
+    print(row_data) # Print selected student data to console
+    print(row_data[0])
+    count = 0
+    for row in row_data:
+        studentSummaryTable.insert(parent='', index=[count], values=(COLUMN_TITLES[count], row_data[count]))
+        count = count + 1
+
+    # Add student image
+    photo = tk.PhotoImage(file='StudentPhotos/1.png')
+    image = tk.Label(main_frame_right_top, image=photo)
+    image.photo = photo # Image disappears due to garbage collection so this line keeps the image
+    image.pack()
+
+table.bind('<<TreeviewSelect>>',clicked_student_update_summary_table)
+studentSummaryTable.column(0,minwidth=30, width=90, anchor='w') # Adjust table column size and place
+studentSummaryTable.pack()
+
+# Student image
+
+#Right Frame UI
+main_frame_right_top.place(x = 0,rely = 0, relwidth = 1, relheight = 0.33)
+main_frame_right_middle.place(x = 0,rely = 0.33, relwidth = 1, relheight = 0.33)
+main_frame_right_bottom.place(x = 0,rely = 0.66, relwidth = 1, relheight = 0.33)
+
+#ttk.Label(main_frame_right_top, background = 'blue').pack(expand = True, fill = 'both')
+#ttk.Label(main_frame_right_middle, background = 'green').pack(expand = True, fill = 'both')
+#ttk.Label(main_frame_right_bottom, background = 'orange').pack(expand = True, fill = 'both')
 
 
 
