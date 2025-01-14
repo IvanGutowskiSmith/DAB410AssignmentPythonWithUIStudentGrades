@@ -88,6 +88,9 @@ main_frame_left_middle = ttk.Frame(main_frame_left)
 main_frame_left_bottom = ttk.Frame(main_frame_left)
 
 main_frame_centre = ttk.Frame(root)
+main_frame_centre_top = ttk.Frame(main_frame_centre)
+main_frame_centre_results_body = ttk.Frame(main_frame_centre)
+
 main_frame_right = ttk.Frame(root)
 
 # Place main layout (Single fixed menu frame along top, main frame divided into 3 columns L:25%, C:50%, R:25%
@@ -160,6 +163,23 @@ label_grades_c_title.grid(row=7,column=0)
 label_grades_c_value.grid(row=7,column=1)
 
 # Summary charts frame
+
+
+
+
+
+# Middle frame search results
+
+# Left column frames
+main_frame_centre_top.place(x = 0,y = 0, relwidth = 1, relheight = 0.1)
+main_frame_centre_results_body.place(x = 0,rely = 0.1, relwidth = 1, relheight = 0.9)
+
+
+# Centre grid frames
+# Search results Widgets
+label_total_student_count_title = ttk.Label(main_frame_left_middle,text = 'total_student_count')
+
+
 
 
 # Run UI
