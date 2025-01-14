@@ -165,7 +165,7 @@ label_grades_c_value.grid(row=7,column=1)
 # Left summary charts frame
 
 # Placeholder colour to show area this frame covers
-ttk.Label(main_frame_left_bottom, background = 'blue').pack(expand = True, fill = 'both')
+ttk.Label(main_frame_left_bottom, background = 'lightBlue').pack(expand = True, fill = 'both')
 
 
 
@@ -210,13 +210,19 @@ for index,row in dataFrame.iterrows():
 def clicked_item(_): # Underscore means we do not care abut the value
     row_ids = table.selection()
     print(row_ids[0]) # Select only first tuple ID if multiple are selected with shift + click
-
+    print(table.item(row_ids[0])['values']) # Print data from row to console
 table.bind('<<TreeviewSelect>>',clicked_item)
+
+
+# TODO add scroll bar, top menu and print student results to right hand side. Possibly edit values or atleast delete student
+
+
 
 
 #table.insert(parent = '',index = 0,values = ('118','Bob','Bobbins','22','bob@email.com','England','98','True','56')) # Parent is empty string as there are no sub items, the table starts with '' as the default parent
 
 
+# Right frame
 
 
 
