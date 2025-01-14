@@ -96,9 +96,9 @@ main_frame_right = ttk.Frame(root)
 
 # Place main layout (Single fixed menu frame along top, main frame divided into 3 columns L:25%, C:50%, R:25%
 menu_banner_frame.place(x = 0,y = 0, relwidth = 1, height = 25)
-main_frame_left.place(x = 0,y = 25, relwidth = 0.25, relheight = 1)
-main_frame_centre.place(relx = 0.25,y = 25, relwidth = 0.5, relheight = 1)
-main_frame_right.place(relx = 0.75,y = 25, relwidth = 0.25, relheight = 1)
+main_frame_left.place(x = 0,y = 25, relwidth = 0.2, relheight = 1)
+main_frame_centre.place(relx = 0.2,y = 25, relwidth = 0.6, relheight = 1)
+main_frame_right.place(relx = 0.8,y = 25, relwidth = 0.2, relheight = 1)
 
 ttk.Label(menu_banner_frame, background = 'red').pack(expand = True, fill = 'both')
 #ttk.Label(main_frame_left, background = 'green').pack(expand = True, fill = 'both')
@@ -174,12 +174,18 @@ ttk.Label(main_frame_left_bottom, background = 'lightBlue').pack(expand = True, 
 # Middle search results frame
 #ttk.Label(main_frame_centre, background = 'orange').pack(expand = True, fill = 'both')
 
-#Temporary data for tree
-first_names = ['Bob','Jim','Alex','Sarah']
-last_names = ['Bobbins','Jimmins','Alexuns','Sarariton']
+# TODO Possibly have columns created dynamically from the data file, may avoid errors this way if a column name is edited, order changed or removed
 
-table = ttk.Treeview(main_frame_centre, columns = ('studentId','firstName','lastName','age','email','country','attendance','assignmentCompleted','grade'), show = 'headings') # The 'show headings' is to set headings to start from the left column
+columns = ('studentId', 'firstName', 'lastName', 'age', 'email', 'country', 'attendance', 'assignmentCompleted', 'grade')
+table = ttk.Treeview(main_frame_centre, columns=columns, show='headings')
 
+# Adjust column widths and alight text to centre
+for col in columns:
+    table.column(col, minwidth=30, width=90, anchor='center')
+table.column('studentId',width=30) #Made ID and age columns narrower
+table.column('age',width=30)
+
+# Adding column titles to table
 table.heading('studentId',text = 'Id')
 table.heading('firstName',text = 'First Name')
 table.heading('lastName',text = 'Last Name')
