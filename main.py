@@ -9,174 +9,7 @@ from tkinter import ttk
 #print(datetime.datetime.now())
 
 
-# Setup UI
-root = tk.Tk()
-root.geometry('1280x720') # 16:9 aspect ratio that should fit on most screens
-root.minsize(640,360)
-root.title('Student Grade Manager. Student ID: 2310700')
-appFont = 'Calibri'
-
-
-# Main layout widgets
-menu_frame = ttk.Frame(root)
-main_frame_left = ttk.Frame(root)
-main_frame_left_search = ttk.Frame(main_frame_left)
-main_frame_centre = ttk.Frame(root)
-main_frame_right = ttk.Frame(root)
-
-# Place main layout (Single fixed menu frame along top, main frame divided into 3 columns L:25%, C:50%, R:25%
-menu_frame.place(x = 0,y = 0, relwidth = 1, height = 25)
-main_frame_left.place(x = 0,y = 25, relwidth = 0.25, relheight = 1)
-main_frame_centre.place(relx = 0.25,y = 25, relwidth = 0.5, relheight = 1)
-main_frame_right.place(relx = 0.75,y = 25, relwidth = 0.25, relheight = 1)
-
-ttk.Label(menu_frame, background = 'red').pack(expand = True, fill = 'both')
-#ttk.Label(main_frame_left, background = 'green').pack(expand = True, fill = 'both')
-#ttk.Label(main_frame_centre, background = 'grey').pack(expand = True, fill = 'both')
-#ttk.Label(main_frame_right, background = 'blue').pack(expand = True, fill = 'both')
-
-# Left column frames
-main_frame_left_search.place(x = 0,y = 0, relwidth = 1, relheight = 0.1)
-#ttk.Label(main_frame_left_search, background = 'pink').pack(expand = True, fill = 'both')
-
-#Left grid frames
-#widgets
-left_menu_search_textEntry = ttk.Entry(main_frame_left_search)
-left_menu_search_btn = ttk.Button(main_frame_left_search,text = 'Search')
-
-# Student Search frame
-main_frame_left_search.columnconfigure(0, weight =2)
-main_frame_left_search.columnconfigure(1, weight = 1)
-main_frame_left_search.rowconfigure(0,weight = 1)
-
-left_menu_search_textEntry.grid(row=0,column=0, sticky = 'ew', padx = 5)
-left_menu_search_btn.grid(row=0,column=1)
-
-# Stats Summary frame
-
-# Summary charts frame
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#root.columnconfigure(0, weight=1, uniform = 'a') # index, weight, uniformity ensures equal column widths
-#root.columnconfigure(1, weight=2, uniform = 'a')
-#root.columnconfigure(2, weight=1, uniform = 'a')
-#root.rowconfigure(0, weight=1,minsize = 25)
-#root.rowconfigure(1, weight=20, uniform = 'b')
-#
-## Add a Frame widget
-#frame = tk.Frame(root, bg = 'Green')
-#
-#label_1 = ttk.Label(frame, background = 'black', text = 'Menu')
-#label_1.grid(column=0, row=0, sticky='NEWS', columnspan = 1)
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#label_Top_Menu = ttk.Label(root, background = 'darkRed', text = 'Menu')
-#label_Top_Menu.grid(column=0, row=0, sticky='NEWS', columnspan = 3)
-#
-#label_LeftFilters = ttk.Label(root, background = 'darkGreen', text = 'Left Menu')
-#label_LeftFilters.grid(column=0, row=1, sticky='NEWS')
-#
-#label_Central_Results = ttk.Label(root, background = 'lightBlue', text = 'Central Results')
-#label_Central_Results.grid(column=1, row=1, sticky='NEWS')
-#
-#label_Right_Student_Info = ttk.Label(root, background = 'lightGreen', text = 'Student Info')
-#label_Right_Student_Info.grid(column=2, row=1, sticky='NEWS')
-#
-#
-## Layout inside a frame
-#search_frame = ttk.Frame(root)
-#search_frame.columnconfigure(0, weight=1, uniform = 'a')
-#search_frame.columnconfigure(1, weight=1, uniform = 'a')
-#search_frame.rowconfigure(0, weight=1, uniform = 'b')
-#
-#search_Box = ttk.Label(search_frame, background = 'Grey', text = 'Search Box')
-#search_Box.grid(column=2, row=1, sticky='NEWS')
-#
-#
-#label_LeftFilters.columnconfigure(0, weight=1, uniform = 'a')
-#label_LeftFilters.columnconfigure(1, weight=1, uniform = 'a')
-#root.rowconfigure(0, weight=1, uniform = 'b')
-#
-#search_Box = ttk.Label(label_LeftFilters, background = 'Grey', text = 'Search Box')
-#
-#
-
-
-# root.columnconfigure(0, weight=1, uniform = 'a') # index, weight, uniformity ensures equal column widths
-# root.columnconfigure(1, weight=2, uniform = 'a')
-# root.columnconfigure(2, weight=1, uniform = 'a')
-# root.rowconfigure((0,1,2,3), weight=1, uniform = 'b') # Can use tuple to save duplicate lines of code, 4 rows created
-
-
-# Frame for student search
-#searchLabelFrame = ttk.LabelFrame(root,text='Search label Frame') # Frame to contain search elements
-#.grid(column=0,row=0,sticky = 'NEWS') # place frame in grid
-# Search box
-#search_entry = ttk.Entry(root) #creating single line text entry box, with searchLabelFrame as parent
-#search_entry.grid(column=0,row=0,sticky = 'we')
-# Search btn
-#search_btn = ttk.Button(root, text='Search for student')
-#search_btn.grid(column=0,row=0,sticky = 'e',padx = 5)
-
-
-
-
-# Run UI
-root.mainloop()
-
-
-
-
-
-
+##########################LOGIC
 
 # Import file / logic
 
@@ -193,8 +26,9 @@ GRADE_C_MINIMUM = 50
 
 print("Total Student count: "+ str(TOTAL_STUDENT_COUNT))
 
-averageAttendance = dataFrame["attendance"].mean() # Using Panda's built in mean average to calculate result, restricted to desired column for attendance
-print("Average grade is:",str(round(dataFrame["grade"].mean(),2)),"%") # Panda to average column 'grade', round to two significant figures, convert, concatenate within a string to print
+AVERAGE_ATTENDANCE = round(dataFrame["attendance"].mean(),2) # Using Panda's built in mean average to calculate result, rounded
+AVERAGE_GRADE = round(dataFrame["grade"].mean(),2)
+print("Average grade is:",str(AVERAGE_GRADE),"%") # Panda to average column 'grade', round to two significant figures, convert, concatenate within a string to print
 
 # Count pass / fails
 runningTotalPassCount = int() # Declare empty variable, 'none' would cause error, considered using zero however, may hide errors as program would run
@@ -209,9 +43,10 @@ for index,row in dataFrame.iterrows():
     else:
         runningTotalFailCount = runningTotalFailCount + 1
 
-
-print("Total Pass: ", str(runningTotalPassCount))
-print("Total Fail: ",str(runningTotalFailCount))
+TOTAL_PASS_COUNT = runningTotalPassCount
+TOTAL_FAIL_COUNT = runningTotalFailCount
+print("Total Pass: ", str(TOTAL_PASS_COUNT))
+print("Total Fail: ",str(TOTAL_FAIL_COUNT))
 
 
 # Calculating grade count A,B,C
@@ -221,9 +56,122 @@ aTrues = (df >= GRADE_A_MINIMUM) # Could validate upper limit, however known pre
 bTrues = (df >= GRADE_B_MINIMUM) & (df < GRADE_A_MINIMUM) # Greater or eq 60, less than 70
 cTrues = (df >= GRADE_C_MINIMUM) & (df < GRADE_B_MINIMUM) # Greater or eq 50, less than 60
 
-print("Grade A count: ",np.count_nonzero(aTrues))
-print("Grade B count: ",np.count_nonzero(bTrues))
-print("Grade C count: ",np.count_nonzero(cTrues))
+GRADE_A_COUNT = np.count_nonzero(aTrues)
+GRADE_B_COUNT = np.count_nonzero(bTrues)
+GRADE_C_COUNT = np.count_nonzero(cTrues)
+print("Grade A count: ",GRADE_A_COUNT)
+print("Grade B count: ",GRADE_B_COUNT)
+print("Grade C count: ",GRADE_B_COUNT)
+
+
+
+
+
+
+####################### UI
+
+
+# Setup UI
+root = tk.Tk()
+root.geometry('1280x720') # 16:9 aspect ratio that should fit on most screens
+root.minsize(640,360)
+root.title('Student Grade Manager. Student ID: 2310700')
+appFont = 'Calibri'
+
+
+# Main layout widgets
+menu_banner_frame = ttk.Frame(root)
+
+main_frame_left = ttk.Frame(root)
+main_frame_left_top = ttk.Frame(main_frame_left)
+main_frame_left_middle = ttk.Frame(main_frame_left)
+main_frame_left_bottom = ttk.Frame(main_frame_left)
+
+main_frame_centre = ttk.Frame(root)
+main_frame_right = ttk.Frame(root)
+
+# Place main layout (Single fixed menu frame along top, main frame divided into 3 columns L:25%, C:50%, R:25%
+menu_banner_frame.place(x = 0,y = 0, relwidth = 1, height = 25)
+main_frame_left.place(x = 0,y = 25, relwidth = 0.25, relheight = 1)
+main_frame_centre.place(relx = 0.25,y = 25, relwidth = 0.5, relheight = 1)
+main_frame_right.place(relx = 0.75,y = 25, relwidth = 0.25, relheight = 1)
+
+ttk.Label(menu_banner_frame, background = 'red').pack(expand = True, fill = 'both')
+#ttk.Label(main_frame_left, background = 'green').pack(expand = True, fill = 'both')
+#ttk.Label(main_frame_centre, background = 'grey').pack(expand = True, fill = 'both')
+#ttk.Label(main_frame_right, background = 'blue').pack(expand = True, fill = 'both')
+
+# Left column frames
+main_frame_left_top.place(x = 0,y = 0, relwidth = 1, relheight = 0.1)
+main_frame_left_middle.place(x = 0,rely = 0.1, relwidth = 1, relheight = 0.4)
+main_frame_left_bottom.place(x = 0,rely = 0.5, relwidth = 1, relheight = 0.5)
+
+
+# Left grid frames
+# Search Widgets
+left_menu_search_textEntry = ttk.Entry(main_frame_left_top)
+left_menu_search_btn = ttk.Button(main_frame_left_top,text = 'Search')
+
+# Stats widgets
+label_total_student_count_title = ttk.Label(main_frame_left_middle,text = 'total_student_count')
+label_total_student_count_value = ttk.Label(main_frame_left_middle,text = TOTAL_STUDENT_COUNT)
+label_avg_grade_title = ttk.Label(main_frame_left_middle,text = 'avg_grade')
+label_avg_grade_value = ttk.Label(main_frame_left_middle,text = str(AVERAGE_GRADE) + "%")
+label_avg_attendance_title = ttk.Label(main_frame_left_middle,text = 'avg_attendance')
+label_avg_attendance_value = ttk.Label(main_frame_left_middle,text = AVERAGE_ATTENDANCE)
+label_total_passes_title = ttk.Label(main_frame_left_middle,text = 'total_passes')
+label_total_passes_value = ttk.Label(main_frame_left_middle,text = TOTAL_PASS_COUNT)
+label_total_fails_title = ttk.Label(main_frame_left_middle,text = 'total_fails')
+label_total_fails_value = ttk.Label(main_frame_left_middle,text = TOTAL_FAIL_COUNT)
+label_grades_a_title = ttk.Label(main_frame_left_middle,text = 'grades_a')
+label_grades_a_value = ttk.Label(main_frame_left_middle,text = GRADE_A_COUNT)
+label_grades_b_title = ttk.Label(main_frame_left_middle,text = 'grades_b')
+label_grades_b_value = ttk.Label(main_frame_left_middle,text = GRADE_B_COUNT)
+label_grades_c_title = ttk.Label(main_frame_left_middle,text = 'grades_c')
+label_grades_c_value = ttk.Label(main_frame_left_middle,text = GRADE_C_COUNT)
+
+# Student Search frame (2 wide 1 deep)
+main_frame_left_top.columnconfigure(0, weight =2) # 2/3rds dedicated to text entry field
+main_frame_left_top.columnconfigure(1, weight = 1)
+main_frame_left_top.rowconfigure(0,weight = 1)
+
+left_menu_search_textEntry.grid(row=0,column=0, sticky = 'ew', padx = 5)
+left_menu_search_btn.grid(row=0,column=1)
+
+# Stats Summary frame (2 wide, 7 deep)
+main_frame_left_middle.columnconfigure((0,1), weight =1) # Use tuple to save duplicate rows of code
+main_frame_left_middle.rowconfigure((0,1,2,3,4,5,6),weight = 1)
+
+label_total_student_count_title.grid(row=0,column=0)
+label_total_student_count_value.grid(row=0,column=1)
+label_avg_grade_title.grid(row=1,column=0)
+label_avg_grade_value.grid(row=1,column=1)
+label_avg_attendance_title.grid(row=2,column=0)
+label_avg_attendance_value.grid(row=2,column=1)
+label_total_fails_title.grid(row=3,column=0)
+label_total_fails_value.grid(row=3,column=1)
+label_total_passes_title.grid(row=4,column=0)
+label_total_passes_value.grid(row=4,column=1)
+label_grades_a_title.grid(row=5,column=0)
+label_grades_a_value.grid(row=5,column=1)
+label_grades_b_title.grid(row=6,column=0)
+label_grades_b_value.grid(row=6,column=1)
+label_grades_c_title.grid(row=7,column=0)
+label_grades_c_value.grid(row=7,column=1)
+
+# Summary charts frame
+
+
+# Run UI
+root.mainloop()
+
+
+
+
+
+
+
+
 
 
 
