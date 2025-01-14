@@ -75,9 +75,12 @@ print("Grade C count: ",GRADE_B_COUNT)
 root = tk.Tk()
 root.geometry('1280x720') # 16:9 aspect ratio that should fit on most screens
 root.minsize(640,360)
+root.configure(background='brown') # May remove later, here as it may show gaps in frames
 root.title('Student Grade Manager. Student ID: 2310700')
 appFont = 'Calibri'
 
+#style=ttk.Style(root)
+#style.theme_use('vista') # Revisit, no styles that looked better than default
 
 # Main layout widgets
 menu_banner_frame = ttk.Frame(root)
@@ -88,8 +91,6 @@ main_frame_left_middle = ttk.Frame(main_frame_left)
 main_frame_left_bottom = ttk.Frame(main_frame_left)
 
 main_frame_centre = ttk.Frame(root)
-main_frame_centre_top = ttk.Frame(main_frame_centre)
-main_frame_centre_results_body = ttk.Frame(main_frame_centre)
 
 main_frame_right = ttk.Frame(root)
 
@@ -108,7 +109,6 @@ ttk.Label(menu_banner_frame, background = 'red').pack(expand = True, fill = 'bot
 main_frame_left_top.place(x = 0,y = 0, relwidth = 1, relheight = 0.1)
 main_frame_left_middle.place(x = 0,rely = 0.1, relwidth = 1, relheight = 0.4)
 main_frame_left_bottom.place(x = 0,rely = 0.5, relwidth = 1, relheight = 0.5)
-
 
 # Left grid frames
 # Search Widgets
@@ -133,7 +133,7 @@ label_grades_b_value = ttk.Label(main_frame_left_middle,text = GRADE_B_COUNT)
 label_grades_c_title = ttk.Label(main_frame_left_middle,text = 'grades_c')
 label_grades_c_value = ttk.Label(main_frame_left_middle,text = GRADE_C_COUNT)
 
-# Student Search frame (2 wide 1 deep)
+# Left student Search frame (2 wide 1 deep)
 main_frame_left_top.columnconfigure(0, weight =2) # 2/3rds dedicated to text entry field
 main_frame_left_top.columnconfigure(1, weight = 1)
 main_frame_left_top.rowconfigure(0,weight = 1)
@@ -141,7 +141,7 @@ main_frame_left_top.rowconfigure(0,weight = 1)
 left_menu_search_textEntry.grid(row=0,column=0, sticky = 'ew', padx = 5)
 left_menu_search_btn.grid(row=0,column=1)
 
-# Stats Summary frame (2 wide, 7 deep)
+# Left stats Summary frame (2 wide, 7 deep)
 main_frame_left_middle.columnconfigure((0,1), weight =1) # Use tuple to save duplicate rows of code
 main_frame_left_middle.rowconfigure((0,1,2,3,4,5,6),weight = 1)
 
@@ -162,22 +162,60 @@ label_grades_b_value.grid(row=6,column=1)
 label_grades_c_title.grid(row=7,column=0)
 label_grades_c_value.grid(row=7,column=1)
 
-# Summary charts frame
+# Left summary charts frame
+
+# Placeholder colour to show area this frame covers
+ttk.Label(main_frame_left_bottom, background = 'blue').pack(expand = True, fill = 'both')
 
 
 
 
 
-# Middle frame search results
+# Middle search results frame
+#ttk.Label(main_frame_centre, background = 'orange').pack(expand = True, fill = 'both')
 
-# Left column frames
-main_frame_centre_top.place(x = 0,y = 0, relwidth = 1, relheight = 0.1)
-main_frame_centre_results_body.place(x = 0,rely = 0.1, relwidth = 1, relheight = 0.9)
+#Temporary data for tree
+first_names = ['Bob','Jim','Alex','Sarah']
+last_names = ['Bobbins','Jimmins','Alexuns','Sarariton']
+
+table = ttk.Treeview(main_frame_centre, columns = ('studentId','firstName','lastName','age','email','country','attendance','assignmentCompleted','grade'), show = 'headings') # The 'show headings' is to set headings to start from the left column
+
+table.heading('studentId',text = 'Id')
+table.heading('firstName',text = 'First Name')
+table.heading('lastName',text = 'Last Name')
+table.heading('age',text = 'Age')
+table.heading('email',text = 'Email')
+table.heading('country',text = 'Country')
+table.heading('attendance',text = 'Attendance %')
+table.heading('assignmentCompleted',text = 'Assignment Completed?')
+table.heading('grade',text = 'Grade')
+table.pack(expand = True, fill = 'both')
+
+# Add values into Treeview table
+for index,row in dataFrame.iterrows():
+    student_id = row['student_id']
+    first_name = row['first_name']
+    last_name = row['last_name']
+    age = row['age']
+    email = row['email']
+    country = row['country']
+    attendance = row['attendance']
+    assignmentCompleted = row['assignment_completed']
+    grade = row['grade']
+
+    studentData = (student_id,first_name,last_name,age,email,country,attendance,assignmentCompleted,grade)
+    table.insert(parent = '', index = student_id, values = studentData) # Using student ID as the row index as it keeps order logical and value is unique
+
+# Table selection event
+def clicked_item(_): # Underscore means we do not care abut the value
+    row_ids = table.selection()
+    print(row_ids[0]) # Select only first tuple ID if multiple are selected with shift + click
+
+table.bind('<<TreeviewSelect>>',clicked_item)
 
 
-# Centre grid frames
-# Search results Widgets
-label_total_student_count_title = ttk.Label(main_frame_left_middle,text = 'total_student_count')
+#table.insert(parent = '',index = 0,values = ('118','Bob','Bobbins','22','bob@email.com','England','98','True','56')) # Parent is empty string as there are no sub items, the table starts with '' as the default parent
+
 
 
 
