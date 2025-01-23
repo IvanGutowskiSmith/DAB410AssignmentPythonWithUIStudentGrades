@@ -3,7 +3,6 @@
 -- Latest python interpreter from Python.org or Windows store (Install this first as packages seem to need re-installing after version update)
 -- Pandas python package via pycharm, select latest version
 -- numpy
--- need pillow addon & customtkinter     (instructions must mention using pip install in addition to pycharm installer)
 -- import tkinter, however no install required as it's part of core Python stack
 -- need git
 
