@@ -230,7 +230,11 @@ def clicked_student_update_summary_table(_): # Underscore means we do not care a
     print('Clicked row Id: ' + row_id[0]) # Select only first tuple ID if multiple are selected with shift + click
     row_data = table.item(row_id[0])['values']
     print(row_data) # Print selected student data to console
-    print(row_data[0])
+
+    # Empty studentSummaryTable if values present. Without this new data only added to top of table, with prior results collated below
+    for item in studentSummaryTable.get_children():
+        studentSummaryTable.delete(item)
+
     count = 0
     for row in row_data:
         studentSummaryTable.insert(parent='', index=[count], values=(COLUMN_TITLES[count], row_data[count]))
