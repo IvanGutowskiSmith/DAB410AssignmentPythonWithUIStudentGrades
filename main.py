@@ -5,6 +5,8 @@ import numpy as np # np is alias, not needed but this is best practice
 
 import tkinter as tk
 from tkinter import ttk
+import customtkinter as ctk # for image??
+from PIL import Image, ImageTk
 #import datetime # Used for testing remove later when not needed
 #print(datetime.datetime.now())
 
@@ -83,6 +85,7 @@ appFont = 'Calibri'
 
 # Main layout widgets
 menu_banner_frame = ttk.Frame(root)
+
 
 main_frame_left = ttk.Frame(root)
 main_frame_left_top = ttk.Frame(main_frame_left)
@@ -230,23 +233,49 @@ def clicked_student_update_summary_table(_): # Underscore means we do not care a
     print('Clicked row Id: ' + row_id[0]) # Select only first tuple ID if multiple are selected with shift + click
     row_data = table.item(row_id[0])['values']
     print(row_data) # Print selected student data to console
-    print(row_data[0])
+
+    # Empty studentSummaryTable if values present. Without this new data only added to top of table, with prior results collated below
+    for item in studentSummaryTable.get_children():
+        studentSummaryTable.delete(item)
+
     count = 0
-    for row in row_data:
+    for rows in row_data:
         studentSummaryTable.insert(parent='', index=[count], values=(COLUMN_TITLES[count], row_data[count]))
         count = count + 1
-
-    # Add student image
-    photo = tk.PhotoImage(file='StudentPhotos/1.png')
-    image = tk.Label(main_frame_right_top, image=photo)
-    image.photo = photo # Image disappears due to garbage collection so this line keeps the image
-    image.pack()
 
 table.bind('<<TreeviewSelect>>',clicked_student_update_summary_table)
 studentSummaryTable.column(0,minwidth=30, width=90, anchor='w') # Adjust table column size and place
 studentSummaryTable.pack()
 
+# Add student image
+#photo = tk.PhotoImage(file='StudentPhotos/1.png')
+#image = tk.Label(main_frame_right_top, image=photo)
+#image.photo = photo  # Image disappears due to garbage collection so this line keeps the image
+#image.pack()
+
 # Student image
+# Import image
+image_original = Image.open('StudentPhotos/1.png').resize((200,300))
+#studentImage = tk.Label(main_frame_right_top, image=image_tk)
+#studentImage.pack()
+
+
+def stretch_image(event): # Get current width and height
+    global resizedTk
+    width = canvas.winfo_width()
+    print(width)
+    height = canvas.winfo_height()
+    resizedImage = image_original.resize((width,height))
+    resizedTk = ImageTk.PhotoImage(resizedImage)
+
+    canvas.create_image(0, 0, image=resizedTk, anchor = 'nw')
+
+
+
+canvas = tk.Canvas(main_frame_right_top, background = 'red', bd = 0, highlightthickness=0,relief='ridge')
+canvas.grid(column = 1, columnspan = 3,row = 0, sticky = 'nsew')
+
+canvas.bind('<Configure>', stretch_image) # This will trigger every time the canvas changes. thus calling the student image resize function
 
 #Right Frame UI
 main_frame_right_top.place(x = 0,rely = 0, relwidth = 1, relheight = 0.33)
