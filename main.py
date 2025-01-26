@@ -1,4 +1,5 @@
 from re import search
+from tkinter.constants import DISABLED, NORMAL
 
 import pandas as pd
 import numpy as np # np is alias, not needed but this is best practice
@@ -232,7 +233,7 @@ table.pack(expand = True, fill = 'both')
 
 
 def students_list_table_update_on_search(ordered_dict):
-
+    table.unbind('<<TreeviewSelect>>') # Temporarily stop student summary table updating as search results change (avoids out of range error as items are deleted)
     # Empty table if data present
     for i in table.get_children():
         table.delete(i)
@@ -241,6 +242,7 @@ def students_list_table_update_on_search(ordered_dict):
     for id_to_add_to_table in ordered_dict.keys():
         student_list_table_add_row(id_to_add_to_table,table_row_number)
         table_row_number += 1 # Iterate column id by 1
+    table.bind('<<TreeviewSelect>>', clicked_student_update_summary_table)
 
 def student_list_table_add_row(id_to_add, table_position):
     # Student ID and table location are offset by 1 (header row) so have to -1 from student_Id for data row ID
@@ -274,25 +276,58 @@ students_list_table_add_all()
 
 
 ## Right frame
+# Right frame top
 
-# Right Frame Logic
+#Despite button being below student image in UI, we need button to exist in code before student image, so that logic can enable/disable the button
+def btn_generate_ai_student_image():
+    # Obtain gender
+    for item in studentSummaryTable.get_children():
+        print(studentSummaryTable.item(item))
+    # compose URL for ai image request
+    #
+
+generate_student_image_button = ttk.Button(main_frame_right_top, text = 'Generate Ai Image', command = btn_generate_ai_student_image, state=DISABLED)
+generate_student_image_button.pack(side = "bottom")
+
+
+
+student_image = None
+def update_student_image(student_id):
+    global student_image
+    # Delete prior image if it exists
+    if student_image is not None:
+        student_image.destroy()
+        student_image = None
+
+    # Update student image: if not found add placeholder image and 'enable AI image' button
+    try:
+        image_original = Image.open('StudentPhotos\\' + str(student_id) + '.jpg').resize((200, 200))  # Double brackets is the size property, source Ai generated images are 1024x1024  1:1
+        generate_student_image_button.config(state=DISABLED)
+    except:
+        print("could not find image, using placeholder")
+        image_original = Image.open('StudentPhotos\\placeholder.jpg').resize((200, 200))
+        generate_student_image_button.config(state=NORMAL)
+    image_tk = ImageTk.PhotoImage(image_original)
+    student_image = ttk.Label(main_frame_right_top, image=image_tk)
+    student_image.image = image_tk  # Save a reference to prevent garbage collection
+    student_image.pack(expand=True, fill='both')
+
+
+
+
+
+
+
+
+# Right frame middle
+
 studentSummaryTable = ttk.Treeview(main_frame_right_middle, columns=('col1','col2'),show='headings')
-
-# Add student placeholder image
-
-placeholder_image = Image.open('StudentPhotos\\placeholder.jpg').resize((200, 200))
-image_tk = ImageTk.PhotoImage(placeholder_image)
-
-image_label = ttk.Label(main_frame_right_top, image=image_tk)
-image_label.image = image_tk  # Required to keep image visible by avoiding garbage collection
-image_label.pack(expand=True, fill='both', padx = 20) # TODO could fit frame better
-
-#def updateStudentimage (studentId):
 
 
 
 # Table row selection event
 def clicked_student_update_summary_table(_): # Underscore means we do not care abut the value
+    # Obtain selected item from main search results table
     row_id = table.selection()
     row_data = table.item(row_id[0])['values'] # Select only first tuple ID if multiple are selected with shift + click
     print(row_data) # Print selected student data to console
@@ -306,18 +341,12 @@ def clicked_student_update_summary_table(_): # Underscore means we do not care a
         studentSummaryTable.insert(parent='', index=[count], values=(COLUMN_TITLES[count], row_data[count]))
         count = count + 1
 
-    # Update student image
-    image_original = Image.open('StudentPhotos\\placeholder.jpg').resize((200,200)) # Double brackets as is the size property, source Ai generated images are 1024x1024  1:1
-    image_tk = ImageTk.PhotoImage(image_original)
-
-    image_label = ttk.Label(main_frame_right_top, image=image_tk)
-    image_label.image = image_tk  # Save a reference to prevent garbage collection
-    image_label.pack(expand=True, fill='both')
+    update_student_image(str(row_data[0]))
 
 
-#ttk.Label(main_frame_right_top).pack(expand=True, fill='both')
 
-table.bind('<<TreeviewSelect>>',clicked_student_update_summary_table)
+table.bind('<<TreeviewSelect>>', clicked_student_update_summary_table)
+
 studentSummaryTable.column(0,minwidth=30, width=90, anchor='w') # Adjust table column size and place
 studentSummaryTable.pack()
 
@@ -331,8 +360,6 @@ main_frame_right_bottom.place(x = 0,rely = 0.66, relwidth = 1, relheight = 0.33)
 #ttk.Label(main_frame_right_top, background = 'blue').pack(expand = True, fill = 'both')
 #ttk.Label(main_frame_right_middle, background = 'green').pack(expand = True, fill = 'both')
 #ttk.Label(main_frame_right_bottom, background = 'orange').pack(expand = True, fill = 'both')
-
-
 
 
 
