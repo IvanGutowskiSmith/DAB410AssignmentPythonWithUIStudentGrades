@@ -5,6 +5,9 @@ import numpy as np # np is alias, not needed but this is best practice
 
 import tkinter as tk
 from tkinter import ttk
+from PIL import Image, ImageTk
+
+from thefuzz import fuzz, process
 #import datetime # Used for testing remove later when not needed
 #print(datetime.datetime.now())
 
@@ -64,7 +67,41 @@ print("Grade C count: ",GRADE_B_COUNT)
 
 
 
+def search_student_event(event=None): # Triggered by search; none is required to accept bindings from key release
+    value_to_search = left_menu_search_textEntry.get()  # TODO combine into method if not re-used much
 
+    rank_dict = {} # Create dictionary to store similarity %
+    highest_accuracy_value = 0
+
+    for indexValue, rows in dataFrame.iterrows():
+
+        key_stats_combined = str(rows["student_id"]) + rows["first_name"] + rows["last_name"]+ rows["email"]+ rows["country"] # Combine key columns into string variable
+
+        similarity_value = fuzz.partial_ratio(value_to_search.lower(),key_stats_combined.lower())
+
+        # Add studentId and similarity % to a dictionary
+        rank_dict[str(rows["student_id"])] = similarity_value
+
+        # Record highest accuracy value
+        if similarity_value > highest_accuracy_value:
+            highest_accuracy_value = similarity_value
+
+    # Reduce results if 100% accuracy results present
+    if highest_accuracy_value == 100:
+        for stu_id, accuracy in list(rank_dict.items()):  # Have to convert dictionary to list on the fly or error: "dictionary changed size during iteration"
+            if accuracy < highest_accuracy_value:
+                del rank_dict[stu_id]  # Remove search results below 100% accuracy
+
+
+    order_search_results = dict(sorted(rank_dict.items(), key=lambda x: x[1], reverse=True)) # Returns ordered dictionary (not allow duplicates) of IDs to display in search results
+    students_list_table_update_on_search(order_search_results)
+
+
+
+
+
+
+    #print(process.extract(value_to_search, dataFrame["first_name"], limit=5, scorer=fuzz.token_sort_ratio))
 
 
 ####################### UI
@@ -117,7 +154,7 @@ main_frame_left_bottom.place(x = 0,rely = 0.5, relwidth = 1, relheight = 0.5)
 # Left grid frames
 # Search Widgets
 left_menu_search_textEntry = ttk.Entry(main_frame_left_top)
-left_menu_search_btn = ttk.Button(main_frame_left_top,text = 'Search')
+left_menu_search_textEntry.bind("<KeyRelease>", search_student_event)
 
 # Stats widgets
 label_total_student_count_title = ttk.Label(main_frame_left_middle,text = 'total_student_count')
@@ -138,12 +175,10 @@ label_grades_c_title = ttk.Label(main_frame_left_middle,text = 'grades_c')
 label_grades_c_value = ttk.Label(main_frame_left_middle,text = GRADE_C_COUNT)
 
 # Left student Search frame (2 wide 1 deep)
-main_frame_left_top.columnconfigure(0, weight =2) # 2/3rds dedicated to text entry field
-main_frame_left_top.columnconfigure(1, weight = 1)
+main_frame_left_top.columnconfigure(0, weight =1)
 main_frame_left_top.rowconfigure(0,weight = 1)
 
 left_menu_search_textEntry.grid(row=0,column=0, sticky = 'ew', padx = 5)
-left_menu_search_btn.grid(row=0,column=1)
 
 # Left stats Summary frame (2 wide, 7 deep)
 main_frame_left_middle.columnconfigure((0,1), weight =1) # Use tuple to save duplicate rows of code
@@ -178,7 +213,8 @@ ttk.Label(main_frame_left_bottom, background = 'lightBlue').pack(expand = True, 
 # Middle search results frame
 #ttk.Label(main_frame_centre, background = 'orange').pack(expand = True, fill = 'both')
 
-# TODO Possibly have columns created dynamically from the data file, may avoid errors this way if a column name is edited, order changed or removed
+
+# Setup all students table
 
 table = ttk.Treeview(main_frame_centre, columns=COLUMN_TITLES, show='headings')
 
@@ -193,30 +229,48 @@ for title in COLUMN_TITLES:
     table.heading(title,text = title)
 table.pack(expand = True, fill = 'both')
 
-# Add values into Treeview table
-for index,row in dataFrame.iterrows():
-    student_id = row['student_id']
-    first_name = row['first_name']
-    last_name = row['last_name']
-    age = row['age']
-    email = row['email']
-    country = row['country']
-    attendance = row['attendance']
-    assignmentCompleted = row['assignment_completed']
-    grade = row['grade']
-
-    studentData = (student_id,first_name,last_name,age,email,country,attendance,assignmentCompleted,grade)
-    table.insert(parent = '', index = student_id, values = studentData) # Using student ID as the row index as it keeps order logical and value is unique
 
 
+def students_list_table_update_on_search(ordered_dict):
 
+    # Empty table if data present
+    for i in table.get_children():
+        table.delete(i)
+
+    table_row_number = 1
+    for id_to_add_to_table in ordered_dict.keys():
+        student_list_table_add_row(id_to_add_to_table,table_row_number)
+        table_row_number += 1 # Iterate column id by 1
+
+def student_list_table_add_row(id_to_add, table_position):
+    # Student ID and table location are offset by 1 (header row) so have to -1 from student_Id for data row ID
+
+    # This may be verbose, however it allows me to be clear about what data is obtained from where
+    student_id = dataFrame.iloc[int(id_to_add)-1,0]
+    first_name = dataFrame.iloc[int(id_to_add)-1,1]
+    last_name = dataFrame.iloc[int(id_to_add)-1,2]
+    age = dataFrame.iloc[int(id_to_add)-1,3]
+    email = dataFrame.iloc[int(id_to_add)-1,4]
+    country = dataFrame.iloc[int(id_to_add)-1,5]
+    attendance = dataFrame.iloc[int(id_to_add)-1,6]
+    assignment_completed = dataFrame.iloc[int(id_to_add)-1,7]
+    grade = dataFrame.iloc[int(id_to_add)-1,8]
+
+    student_data = (student_id, first_name, last_name, age, email, country, attendance, assignment_completed, grade)
+    # Add row to search results table of students
+    table.insert(parent='', index=table_position, values=student_data)
+
+def students_list_table_add_all():
+    count = 1
+    for count,rows in dataFrame.iterrows():
+        student_list_table_add_row(rows['student_id'],count)
+        count += 1 # Iterate column id by 1
+
+# On startup populate table
+students_list_table_add_all()
 
 # TODO add scroll bar, top menu and print student results to right hand side. Possibly edit values or atleast delete student
 
-
-
-
-#table.insert(parent = '',index = 0,values = ('118','Bob','Bobbins','22','bob@email.com','England','98','True','56')) # Parent is empty string as there are no sub items, the table starts with '' as the default parent
 
 
 ## Right frame
@@ -224,11 +278,23 @@ for index,row in dataFrame.iterrows():
 # Right Frame Logic
 studentSummaryTable = ttk.Treeview(main_frame_right_middle, columns=('col1','col2'),show='headings')
 
+# Add student placeholder image
+
+placeholder_image = Image.open('StudentPhotos\\placeholder.jpg').resize((200, 200))
+image_tk = ImageTk.PhotoImage(placeholder_image)
+
+image_label = ttk.Label(main_frame_right_top, image=image_tk)
+image_label.image = image_tk  # Required to keep image visible by avoiding garbage collection
+image_label.pack(expand=True, fill='both', padx = 20) # TODO could fit frame better
+
+#def updateStudentimage (studentId):
+
+
+
 # Table row selection event
 def clicked_student_update_summary_table(_): # Underscore means we do not care abut the value
     row_id = table.selection()
-    print('Clicked row Id: ' + row_id[0]) # Select only first tuple ID if multiple are selected with shift + click
-    row_data = table.item(row_id[0])['values']
+    row_data = table.item(row_id[0])['values'] # Select only first tuple ID if multiple are selected with shift + click
     print(row_data) # Print selected student data to console
 
     # Empty studentSummaryTable if values present. Without this new data only added to top of table, with prior results collated below
@@ -240,11 +306,16 @@ def clicked_student_update_summary_table(_): # Underscore means we do not care a
         studentSummaryTable.insert(parent='', index=[count], values=(COLUMN_TITLES[count], row_data[count]))
         count = count + 1
 
-    # Add student image
-    photo = tk.PhotoImage(file='StudentPhotos/1.png')
-    image = tk.Label(main_frame_right_top, image=photo)
-    image.photo = photo # Image disappears due to garbage collection so this line keeps the image
-    image.pack()
+    # Update student image
+    image_original = Image.open('StudentPhotos\\placeholder.jpg').resize((200,200)) # Double brackets as is the size property, source Ai generated images are 1024x1024  1:1
+    image_tk = ImageTk.PhotoImage(image_original)
+
+    image_label = ttk.Label(main_frame_right_top, image=image_tk)
+    image_label.image = image_tk  # Save a reference to prevent garbage collection
+    image_label.pack(expand=True, fill='both')
+
+
+#ttk.Label(main_frame_right_top).pack(expand=True, fill='both')
 
 table.bind('<<TreeviewSelect>>',clicked_student_update_summary_table)
 studentSummaryTable.column(0,minwidth=30, width=90, anchor='w') # Adjust table column size and place
@@ -260,6 +331,10 @@ main_frame_right_bottom.place(x = 0,rely = 0.66, relwidth = 1, relheight = 0.33)
 #ttk.Label(main_frame_right_top, background = 'blue').pack(expand = True, fill = 'both')
 #ttk.Label(main_frame_right_middle, background = 'green').pack(expand = True, fill = 'both')
 #ttk.Label(main_frame_right_bottom, background = 'orange').pack(expand = True, fill = 'both')
+
+
+
+
 
 
 
