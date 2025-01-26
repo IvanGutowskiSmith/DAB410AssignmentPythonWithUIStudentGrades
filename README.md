@@ -4,7 +4,7 @@
 -- Pandas python package via pycharm, select latest version
 -- numpy also could mention to install via pip install
 pillow for images ?
--- addon, theFuzz for search
+-- addon, theFuzz for search, requests for API
 -- import tkinter, however no install required as it's part of core Python stack
 -- need git
 
