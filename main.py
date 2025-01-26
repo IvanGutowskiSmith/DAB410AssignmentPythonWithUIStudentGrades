@@ -3,6 +3,7 @@ from tkinter.constants import DISABLED, NORMAL
 
 import pandas as pd
 import numpy as np # np is alias, not needed but this is best practice
+import requests
 
 import tkinter as tk
 from tkinter import ttk
@@ -112,7 +113,7 @@ def search_student_event(event=None): # Triggered by search; none is required to
 root = tk.Tk()
 root.geometry('1280x720') # 16:9 aspect ratio that should fit on most screens
 root.minsize(640,360)
-root.configure(background='brown') # May remove later, here as it may show gaps in frames
+root.iconbitmap('favicon.ico')
 root.title('Student Grade Manager. Student ID: 2310700')
 appFont = 'Calibri'
 
@@ -233,7 +234,6 @@ table.pack(expand = True, fill = 'both')
 
 
 def students_list_table_update_on_search(ordered_dict):
-    table.unbind('<<TreeviewSelect>>') # Temporarily stop student summary table updating as search results change (avoids out of range error as items are deleted)
     # Empty table if data present
     for i in table.get_children():
         table.delete(i)
@@ -242,7 +242,6 @@ def students_list_table_update_on_search(ordered_dict):
     for id_to_add_to_table in ordered_dict.keys():
         student_list_table_add_row(id_to_add_to_table,table_row_number)
         table_row_number += 1 # Iterate column id by 1
-    table.bind('<<TreeviewSelect>>', clicked_student_update_summary_table)
 
 def student_list_table_add_row(id_to_add, table_position):
     # Student ID and table location are offset by 1 (header row) so have to -1 from student_Id for data row ID
@@ -278,13 +277,68 @@ students_list_table_add_all()
 ## Right frame
 # Right frame top
 
+def save_image_from_url(student_id, image_url):
+    destination_path = 'StudentPhotos\\' + str(student_id) + '.jpg'
+    response = requests.get(image_url)
+    if response.status_code == 200:
+        with open(destination_path, 'wb') as file:
+            file.write(response.content)
+            print('Ai image downloaded and saved in: ' + destination_path)
+    else:
+        print('Download ai image failed for URL: '+ image_url)
+
+
 #Despite button being below student image in UI, we need button to exist in code before student image, so that logic can enable/disable the button
 def btn_generate_ai_student_image():
-    # Obtain gender
-    for item in studentSummaryTable.get_children():
-        print(studentSummaryTable.item(item))
+    # Predict gender from name
+    predicted_gender = 'male' # Put any gender so program may still work if gender prediction fails
+
+    url = 'https://api.genderize.io?name=' + str(currently_selected_first_name) # Not sure if required but ensured this was a string
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        data = response.json()
+        predicted_gender = data['gender']
+        print('Predicted gender for name: ' + currently_selected_first_name)
+        print(predicted_gender)
+    else:
+        print('could not determine gender') # TODO improve error handling
+        return
+
+    # Determine age bracket - None of the students are over 25, however logic will remain if required
+    age = int(currently_selected_age)
+
+    age_bracket = 'all'
+    if age <= 18:
+        age_bracket = '12-18'
+    elif age <= 25:
+        age_bracket = '19-25'
+    elif age <= 35:
+        age_bracket = '26-35'
+    elif age <= 50:
+        age_bracket = '35-50' # Request API has error here were it requests boundary of range below (35)
+    else:
+        age_bracket = '50' # request just states 50
+
+    print('Age bracket: ' + age_bracket)
+
     # compose URL for ai image request
+    url = 'https://this-person-does-not-exist.com/new?time=1737815809253&gender=' + predicted_gender + '&age=' + age_bracket + '&etnic=all'
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        data = response.json()
+        ai_image_url = 'https://this-person-does-not-exist.com/img/' + data['name']
+
+        print("Ai image url: " + ai_image_url)
+        save_image_from_url(currently_selected_student_id, ai_image_url)
+        update_student_image(currently_selected_student_id)
+    else:
+        print("could not obtain AI image") # TODO improve error handling
+        return
     #
+
+
 
 generate_student_image_button = ttk.Button(main_frame_right_top, text = 'Generate Ai Image', command = btn_generate_ai_student_image, state=DISABLED)
 generate_student_image_button.pack(side = "bottom")
@@ -310,7 +364,7 @@ def update_student_image(student_id):
     image_tk = ImageTk.PhotoImage(image_original)
     student_image = ttk.Label(main_frame_right_top, image=image_tk)
     student_image.image = image_tk  # Save a reference to prevent garbage collection
-    student_image.pack(expand=True, fill='both')
+    student_image.pack(expand=True, fill='both', padx = 20, pady = 20)
 
 
 
@@ -323,13 +377,25 @@ def update_student_image(student_id):
 
 studentSummaryTable = ttk.Treeview(main_frame_right_middle, columns=('col1','col2'),show='headings')
 
+# Variables for currently selected student
+currently_selected_student_id = ''
+currently_selected_first_name = ''
+currently_selected_age = ''
 
 
 # Table row selection event
 def clicked_student_update_summary_table(_): # Underscore means we do not care abut the value
+    global currently_selected_student_id
+    global currently_selected_first_name
+    global currently_selected_age
     # Obtain selected item from main search results table
-    row_id = table.selection()
-    row_data = table.item(row_id[0])['values'] # Select only first tuple ID if multiple are selected with shift + click
+    selected_item_row_id = table.selection()
+
+    # As main search results change / are deleted, skip student summary table from updating if entries are deleted (avoid out of range errors)
+    if not selected_item_row_id or selected_item_row_id[0] not in table.get_children():
+        return  # Exit with no changes made
+
+    row_data = table.item(selected_item_row_id[0])['values'] # Select only first tuple ID if multiple are selected with shift + click
     print(row_data) # Print selected student data to console
 
     # Empty studentSummaryTable if values present. Without this new data only added to top of table, with prior results collated below
@@ -339,6 +405,14 @@ def clicked_student_update_summary_table(_): # Underscore means we do not care a
     count = 0
     for row in row_data:
         studentSummaryTable.insert(parent='', index=[count], values=(COLUMN_TITLES[count], row_data[count]))
+        # Update global variables for 'selected student'
+        match COLUMN_TITLES[count]:
+            case 'student_id':
+                currently_selected_student_id = row_data[count]
+            case 'first_name':
+                currently_selected_first_name = row_data[count]
+            case 'age':
+                currently_selected_age = row_data[count]
         count = count + 1
 
     update_student_image(str(row_data[0]))
