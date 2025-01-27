@@ -1,5 +1,6 @@
 from re import search
 from tkinter.constants import DISABLED, NORMAL
+from types import NoneType
 
 import pandas as pd
 import numpy as np # np is alias, not needed but this is best practice
@@ -8,8 +9,11 @@ import requests
 import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
+from pandas.core.methods.to_dict import to_dict
 
 from thefuzz import fuzz, process
+from matplotlib import pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 #import datetime # Used for testing remove later when not needed
 #print(datetime.datetime.now())
 
@@ -67,7 +71,8 @@ print("Grade A count: ",GRADE_A_COUNT)
 print("Grade B count: ",GRADE_B_COUNT)
 print("Grade C count: ",GRADE_B_COUNT)
 
-
+# Average grade by country
+average_grade_per_country = dataFrame.groupby('country')['grade'].mean().to_dict()
 
 def search_student_event(event=None): # Triggered by search; none is required to accept bindings from key release
     value_to_search = left_menu_search_textEntry.get()  # TODO combine into method if not re-used much
@@ -76,8 +81,13 @@ def search_student_event(event=None): # Triggered by search; none is required to
     highest_accuracy_value = 0
 
     for indexValue, rows in dataFrame.iterrows():
+        key_stats_combined = str(rows["student_id"]) + rows["first_name"] + rows["last_name"] # Combine key columns into string variable
 
-        key_stats_combined = str(rows["student_id"]) + rows["first_name"] + rows["last_name"]+ rows["email"]+ rows["country"] # Combine key columns into string variable
+        # Use checkboxes to determine if email and country are included in search scope
+        if filter_email_state.get() == 1: # Is filter checkbox unchecked (1)
+            key_stats_combined = key_stats_combined + rows["email"] # Append email to search string
+        if filter_country_state.get() == 1:
+            key_stats_combined = key_stats_combined + rows["country"]
 
         similarity_value = fuzz.partial_ratio(value_to_search.lower(),key_stats_combined.lower())
 
@@ -88,7 +98,7 @@ def search_student_event(event=None): # Triggered by search; none is required to
         if similarity_value > highest_accuracy_value:
             highest_accuracy_value = similarity_value
 
-    # Reduce results if 100% accuracy results present
+    # Reduce results if search items with 100% accuracy present
     if highest_accuracy_value == 100:
         for stu_id, accuracy in list(rank_dict.items()):  # Have to convert dictionary to list on the fly or error: "dictionary changed size during iteration"
             if accuracy < highest_accuracy_value:
@@ -102,23 +112,23 @@ def search_student_event(event=None): # Triggered by search; none is required to
 
 
 
-
-    #print(process.extract(value_to_search, dataFrame["first_name"], limit=5, scorer=fuzz.token_sort_ratio))
-
-
 ####################### UI
 
 
 # Setup UI
 root = tk.Tk()
 root.geometry('1280x720') # 16:9 aspect ratio that should fit on most screens
-root.minsize(640,360)
+root.minsize(1024,576)
 root.iconbitmap('favicon.ico')
 root.title('Student Grade Manager. Student ID: 2310700')
 appFont = 'Calibri'
 
 #style=ttk.Style(root)
 #style.theme_use('vista') # Revisit, no styles that looked better than default
+
+# Global variables:
+filter_email_state = tk.IntVar(value=1) # Pre tick checkbox
+filter_country_state = tk.IntVar(value=1)
 
 # Main layout widgets
 menu_banner_frame = ttk.Frame(root)
@@ -136,7 +146,6 @@ main_frame_right_middle = ttk.Frame(main_frame_right)
 main_frame_right_bottom = ttk.Frame(main_frame_right)
 
 topMenuHeight = 25
-
 # Place main layout (Single fixed menu frame along top, main frame divided into 3 columns L:25%, C:50%, R:25%
 menu_banner_frame.place(x = 0,y = 0, relwidth = 1, height = topMenuHeight)
 main_frame_left.place(x = 0,y = topMenuHeight, relwidth = 0.2, relheight = 1)
@@ -149,14 +158,18 @@ ttk.Label(menu_banner_frame, background = 'red').pack(expand = True, fill = 'bot
 #ttk.Label(main_frame_right, background = 'blue').pack(expand = True, fill = 'both')
 
 # Left column frames
-main_frame_left_top.place(x = 0,y = 0, relwidth = 1, relheight = 0.1)
-main_frame_left_middle.place(x = 0,rely = 0.1, relwidth = 1, relheight = 0.4)
-main_frame_left_bottom.place(x = 0,rely = 0.5, relwidth = 1, relheight = 0.5)
+main_frame_left_top.place(x = 0,y = 0, relwidth = 1, relheight = 0.2)
+main_frame_left_middle.place(x = 0,rely = 0.2, relwidth = 1, relheight = 0.6)
+main_frame_left_bottom.place(x = 0,rely = 0.8, relwidth = 1, relheight = 0.1)
 
 # Left grid frames
 # Search Widgets
+left_menu_search_Label = ttk.Label(main_frame_left_top, text= 'Search by ID, name(s) email and country')
 left_menu_search_textEntry = ttk.Entry(main_frame_left_top)
 left_menu_search_textEntry.bind("<KeyRelease>", search_student_event)
+left_menu_search_filter_title = ttk.Label(main_frame_left_top, text= 'Include In search:')
+left_menu_search_filter_email = tk.Checkbutton(main_frame_left_top, text='Email',variable = filter_email_state,onvalue=1, offvalue=0, command=search_student_event)
+left_menu_search_filter_country = tk.Checkbutton(main_frame_left_top, text='Country',variable = filter_country_state,onvalue=1, offvalue=0, command=search_student_event)
 
 # Stats widgets
 label_total_student_count_title = ttk.Label(main_frame_left_middle,text = 'total_student_count')
@@ -180,7 +193,11 @@ label_grades_c_value = ttk.Label(main_frame_left_middle,text = GRADE_C_COUNT)
 main_frame_left_top.columnconfigure(0, weight =1)
 main_frame_left_top.rowconfigure(0,weight = 1)
 
-left_menu_search_textEntry.grid(row=0,column=0, sticky = 'ew', padx = 5)
+left_menu_search_Label.grid(row=0,column=0, sticky = 'ew', padx = 5)
+left_menu_search_textEntry.grid(row=1,column=0, sticky = 'ew', padx = 5)
+left_menu_search_filter_title.grid(row=2,column=0, sticky = 'w', padx = 5, pady =5 )
+left_menu_search_filter_email.grid(row=3,column=0, sticky = 'w', padx = 5)
+left_menu_search_filter_country.grid(row=4,column=0, sticky = 'w', padx = 5)
 
 # Left stats Summary frame (2 wide, 7 deep)
 main_frame_left_middle.columnconfigure((0,1), weight =1) # Use tuple to save duplicate rows of code
@@ -205,12 +222,40 @@ label_grades_c_value.grid(row=7,column=1)
 
 # Left summary charts frame
 
+
 # Placeholder colour to show area this frame covers
-ttk.Label(main_frame_left_bottom, background = 'lightBlue').pack(expand = True, fill = 'both')
+#ttk.Label(main_frame_left_bottom, background = 'lightBlue').pack(expand = True, fill = 'both') #TODO remove when bar chart works
+
+# left bottom pane
 
 
+def avg_grade_bar_chart_new_window():
+    new_window = tk.Toplevel(root)
+    new_window.minsize(640, 480)
+    new_window.iconbitmap('favicon.ico')
 
+    fig, ax = plt.subplots()
+    bar_chart_canvas = FigureCanvasTkAgg(fig,master = new_window)
+    bar_chart_canvas.get_tk_widget().pack()
 
+    # Bar chart
+    plt.style.use('fivethirtyeight')
+
+    countries_x = average_grade_per_country.keys()
+    grades_y = average_grade_per_country.values()
+    plt.bar(countries_x,grades_y, color = 'LightBlue', label='Grade')
+
+    plt.title('Average grade by country')
+
+    plt.xlabel('Country')
+    plt.ylabel('Grade')
+
+    plt.xticks(fontsize=5,rotation=90)
+    plt.tight_layout()
+    bar_chart_canvas.draw()
+
+load_graph_button = tk.Button(main_frame_left_bottom,text ="Load grade by country graph", command = avg_grade_bar_chart_new_window)
+load_graph_button.pack(pady=20)
 
 # Middle search results frame
 #ttk.Label(main_frame_centre, background = 'orange').pack(expand = True, fill = 'both')
@@ -275,7 +320,7 @@ students_list_table_add_all()
 
 
 ## Right frame
-# Right frame top
+# Right top frame
 
 def save_image_from_url(student_id, image_url):
     destination_path = 'StudentPhotos\\' + str(student_id) + '.jpg'
@@ -291,7 +336,7 @@ def save_image_from_url(student_id, image_url):
 #Despite button being below student image in UI, we need button to exist in code before student image, so that logic can enable/disable the button
 def btn_generate_ai_student_image():
     # Predict gender from name
-    predicted_gender = 'male' # Put any gender so program may still work if gender prediction fails
+    predicted_gender = 'all' # Put any gender so program may still work if gender prediction fails
 
     url = 'https://api.genderize.io?name=' + str(currently_selected_first_name) # Not sure if required but ensured this was a string
     response = requests.get(url)
@@ -302,8 +347,12 @@ def btn_generate_ai_student_image():
         print('Predicted gender for name: ' + currently_selected_first_name)
         print(predicted_gender)
     else:
-        print('could not determine gender') # TODO improve error handling
+        print('could not get response from gender API') # TODO improve error handling
         return
+
+    if predicted_gender is None: # e.g. Student 3 'Wanids' fails gender prediction
+        predicted_gender = 'all'
+        print('Gender not determined, defaulting to any')
 
     # Determine age bracket - None of the students are over 25, however logic will remain if required
     age = int(currently_selected_age)
@@ -323,7 +372,8 @@ def btn_generate_ai_student_image():
     print('Age bracket: ' + age_bracket)
 
     # compose URL for ai image request
-    url = 'https://this-person-does-not-exist.com/new?time=1737815809253&gender=' + predicted_gender + '&age=' + age_bracket + '&etnic=all'
+    url = 'https://this-person-does-not-exist.com/new?time=1737815809253&gender=' + str(predicted_gender) + '&age=' + age_bracket + '&etnic=all'
+    print('Request image using paramaters: ' + url)
     response = requests.get(url)
 
     if response.status_code == 200:
@@ -370,9 +420,6 @@ def update_student_image(student_id):
 
 
 
-
-
-
 # Right frame middle
 
 studentSummaryTable = ttk.Treeview(main_frame_right_middle, columns=('col1','col2'),show='headings')
@@ -381,6 +428,25 @@ studentSummaryTable = ttk.Treeview(main_frame_right_middle, columns=('col1','col
 currently_selected_student_id = ''
 currently_selected_first_name = ''
 currently_selected_age = ''
+currently_selected_country = ''
+currently_selected_grade = ''
+
+
+def student_performance_summary_update():
+    global currently_selected_country
+    # Calculate percentage grade vs country average
+    a = float(currently_selected_grade)
+    b = round(float(average_grade_per_country[currently_selected_country]),2)
+    print("gggggg")
+    print(a)
+    print(b)
+    percentage = (a / b) * 100
+
+    print (str(round(percentage,2)) + '%')
+
+
+    performance_summary = ttk.Label(main_frame_right_bottom,text = 'hiii')
+    performance_summary.pack()
 
 
 # Table row selection event
@@ -388,24 +454,25 @@ def clicked_student_update_summary_table(_): # Underscore means we do not care a
     global currently_selected_student_id
     global currently_selected_first_name
     global currently_selected_age
-    # Obtain selected item from main search results table
-    selected_item_row_id = table.selection()
+    global currently_selected_country
+    global currently_selected_grade
+
+    selected_item_row_id = table.selection() # Obtain selected item from main search results table
 
     # As main search results change / are deleted, skip student summary table from updating if entries are deleted (avoid out of range errors)
     if not selected_item_row_id or selected_item_row_id[0] not in table.get_children():
         return  # Exit with no changes made
 
     row_data = table.item(selected_item_row_id[0])['values'] # Select only first tuple ID if multiple are selected with shift + click
-    print(row_data) # Print selected student data to console
 
     # Empty studentSummaryTable if values present. Without this new data only added to top of table, with prior results collated below
     for item in studentSummaryTable.get_children():
         studentSummaryTable.delete(item)
 
+    #Populate student summary table and save key values to global variables
     count = 0
     for row in row_data:
         studentSummaryTable.insert(parent='', index=[count], values=(COLUMN_TITLES[count], row_data[count]))
-        # Update global variables for 'selected student'
         match COLUMN_TITLES[count]:
             case 'student_id':
                 currently_selected_student_id = row_data[count]
@@ -413,9 +480,14 @@ def clicked_student_update_summary_table(_): # Underscore means we do not care a
                 currently_selected_first_name = row_data[count]
             case 'age':
                 currently_selected_age = row_data[count]
+            case 'country':
+                currently_selected_country = row_data[count]
+            case 'grade':
+                currently_selected_grade = row_data[count]
         count = count + 1
 
     update_student_image(str(row_data[0]))
+    student_performance_summary_update()
 
 
 
