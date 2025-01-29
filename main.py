@@ -74,6 +74,9 @@ print("Grade C count: ",GRADE_B_COUNT)
 # Average grade by country
 average_grade_per_country = dataFrame.groupby('country')['grade'].mean().to_dict()
 
+
+
+
 def search_student_event(event=None): # Triggered by search; none is required to accept bindings from key release
     value_to_search = left_menu_search_textEntry.get()  # TODO combine into method if not re-used much
 
@@ -167,7 +170,7 @@ main_frame_left_bottom.place(x = 0,rely = 0.8, relwidth = 1, relheight = 0.1)
 left_menu_search_Label = ttk.Label(main_frame_left_top, text= 'Search by ID, name(s) email and country')
 left_menu_search_textEntry = ttk.Entry(main_frame_left_top)
 left_menu_search_textEntry.bind("<KeyRelease>", search_student_event)
-left_menu_search_filter_title = ttk.Label(main_frame_left_top, text= 'Include In search:')
+left_menu_search_filter_title = ttk.Label(main_frame_left_top, text= 'Include in search:')
 left_menu_search_filter_email = tk.Checkbutton(main_frame_left_top, text='Email',variable = filter_email_state,onvalue=1, offvalue=0, command=search_student_event)
 left_menu_search_filter_country = tk.Checkbutton(main_frame_left_top, text='Country',variable = filter_country_state,onvalue=1, offvalue=0, command=search_student_event)
 
@@ -199,6 +202,8 @@ left_menu_search_filter_title.grid(row=2,column=0, sticky = 'w', padx = 5, pady 
 left_menu_search_filter_email.grid(row=3,column=0, sticky = 'w', padx = 5)
 left_menu_search_filter_country.grid(row=4,column=0, sticky = 'w', padx = 5)
 
+left_menu_search_textEntry.focus() # Pre-select search field so functionality is more obvious, with no search button
+
 # Left stats Summary frame (2 wide, 7 deep)
 main_frame_left_middle.columnconfigure((0,1), weight =1) # Use tuple to save duplicate rows of code
 main_frame_left_middle.rowconfigure((0,1,2,3,4,5,6),weight = 1)
@@ -228,7 +233,7 @@ label_grades_c_value.grid(row=7,column=1)
 
 # left bottom pane
 
-
+# Load bar chart in new window as UI was too crowded for a graph in remaining space
 def avg_grade_bar_chart_new_window():
     new_window = tk.Toplevel(root)
     new_window.minsize(640, 480)
@@ -241,20 +246,37 @@ def avg_grade_bar_chart_new_window():
     # Bar chart
     plt.style.use('fivethirtyeight')
 
-    countries_x = average_grade_per_country.keys()
-    grades_y = average_grade_per_country.values()
+    # dict(sorted(rank_dict.items(), key=lambda x: x[1], reverse=True))
+
+    # Order by highest grade, seems to make a list of tuples which is hard to process
+    l = dict(sorted(average_grade_per_country.items(),key=lambda x:x[1], reverse=True))
+    print("first 10 items")
+
+    # Many, many complex solutions or addons online, conflicts over solution. Went with iteration to keep items desired (online stated removing items could risk altering index order so safer to keep what you want than delete what you don't)
+
+    top_10_countries = {} # Adding to new dict is safer, as cannot change dict during iteration and index values may change
+    count = 0
+    for x,y in l.items():
+        if count < 10:
+            top_10_countries[x]=y
+        count += 1
+
+
+    countries_x = top_10_countries.keys()
+    grades_y = top_10_countries.values()
+
     plt.bar(countries_x,grades_y, color = 'LightBlue', label='Grade')
 
-    plt.title('Average grade by country')
+    plt.title('Top 10 countries by average grade')
 
     plt.xlabel('Country')
     plt.ylabel('Grade')
 
-    plt.xticks(fontsize=5,rotation=90)
+    plt.xticks(rotation=45)
     plt.tight_layout()
     bar_chart_canvas.draw()
 
-load_graph_button = tk.Button(main_frame_left_bottom,text ="Load grade by country graph", command = avg_grade_bar_chart_new_window)
+load_graph_button = tk.Button(main_frame_left_bottom,text ="Top performing countries", command = avg_grade_bar_chart_new_window)
 load_graph_button.pack(pady=20)
 
 # Middle search results frame
@@ -390,8 +412,8 @@ def btn_generate_ai_student_image():
 
 
 
-generate_student_image_button = ttk.Button(main_frame_right_top, text = 'Generate Ai Image', command = btn_generate_ai_student_image, state=DISABLED)
-generate_student_image_button.pack(side = "bottom")
+generate_student_image_button = ttk.Button(main_frame_right_top, text = 'Generate student photo', command = btn_generate_ai_student_image, state=DISABLED)
+generate_student_image_button.pack(side = "bottom", pady = 5)
 
 
 
@@ -417,35 +439,43 @@ def update_student_image(student_id):
     student_image.pack(expand=True, fill='both', padx = 20, pady = 20)
 
 
-
-
-
 # Right frame middle
 
 studentSummaryTable = ttk.Treeview(main_frame_right_middle, columns=('col1','col2'),show='headings')
 
 # Variables for currently selected student
-currently_selected_student_id = ''
+currently_selected_student_id = 0
 currently_selected_first_name = ''
-currently_selected_age = ''
+currently_selected_age = 0
 currently_selected_country = ''
-currently_selected_grade = ''
+currently_selected_grade = 0
 
 
 def student_performance_summary_update():
-    global currently_selected_country
-    # Calculate percentage grade vs country average
-    a = float(currently_selected_grade)
-    b = round(float(average_grade_per_country[currently_selected_country]),2)
-    print("gggggg")
-    print(a)
-    print(b)
-    percentage = (a / b) * 100
+    global performance_summary
+    new = float(currently_selected_grade) # Student grade
+    original = float(average_grade_per_country[currently_selected_country]) # Average grade for their country
 
-    print (str(round(percentage,2)) + '%')
+    # Calculate student grade vs their country average. Used: https://www.skillsyouneed.com/num/percent-change.html
+    # New number - Original number
+    difference = new - original
+    # Divide increase by original number then x 100 | Negative = percentage decrease
+    percent_difference = ( difference / original ) * 100
+    percent_difference = round(percent_difference,2) # Rounded on this line as the ',2' for rounding makes the calculation above confusing to read
+    print(percent_difference)
 
+    # Delete existing summary
+    performance_summary.destroy()
 
-    performance_summary = ttk.Label(main_frame_right_bottom,text = 'hiii')
+    if percent_difference >= 0: # Considering 0 positive
+        print("positive")
+        performance_summary = ttk.Label(main_frame_right_bottom, text=currently_selected_first_name + " has a test grade "+ str(percent_difference) + '% higher than the average for their home country of '+currently_selected_country, foreground='Green', wraplength = 250)
+    else:
+        print("negative")
+        performance_summary = ttk.Label(main_frame_right_bottom, text=currently_selected_first_name + " has a test grade "+ str(percent_difference) + '% below the average for their home country of '+currently_selected_country, foreground='DarkRed',  wraplength = 250)
+
+    # Place updated summary label
+    performance_summary.config(justify="center",font=('Helvetica bold', 12)) # Justify centre reduces variation in text movement between student selection
     performance_summary.pack()
 
 
@@ -490,7 +520,6 @@ def clicked_student_update_summary_table(_): # Underscore means we do not care a
     student_performance_summary_update()
 
 
-
 table.bind('<<TreeviewSelect>>', clicked_student_update_summary_table)
 
 studentSummaryTable.column(0,minwidth=30, width=90, anchor='w') # Adjust table column size and place
@@ -507,9 +536,8 @@ main_frame_right_bottom.place(x = 0,rely = 0.66, relwidth = 1, relheight = 0.33)
 #ttk.Label(main_frame_right_middle, background = 'green').pack(expand = True, fill = 'both')
 #ttk.Label(main_frame_right_bottom, background = 'orange').pack(expand = True, fill = 'both')
 
-
-
-
+performance_summary = ttk.Label(main_frame_right_bottom, text='Select student ...')
+performance_summary.pack()
 
 # Run UI
 root.mainloop()
