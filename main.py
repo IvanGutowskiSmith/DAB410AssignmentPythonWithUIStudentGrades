@@ -155,15 +155,28 @@ main_frame_left.place(x = 0,y = topMenuHeight, relwidth = 0.2, relheight = 1)
 main_frame_centre.place(relx = 0.2,y = topMenuHeight, relwidth = 0.6, relheight = 1)
 main_frame_right.place(relx = 0.8,y = topMenuHeight, relwidth = 0.2, relheight = 1)
 
-ttk.Label(menu_banner_frame, background = 'red').pack(expand = True, fill = 'both')
-#ttk.Label(main_frame_left, background = 'green').pack(expand = True, fill = 'both')
-#ttk.Label(main_frame_centre, background = 'grey').pack(expand = True, fill = 'both')
-#ttk.Label(main_frame_right, background = 'blue').pack(expand = True, fill = 'both')
-
 # Left column frames
 main_frame_left_top.place(x = 0,y = 0, relwidth = 1, relheight = 0.2)
 main_frame_left_middle.place(x = 0,rely = 0.2, relwidth = 1, relheight = 0.6)
 main_frame_left_bottom.place(x = 0,rely = 0.8, relwidth = 1, relheight = 0.1)
+
+# Top menu bar frames
+def drop_down_clicked(_):
+    if drop_down.get() == menu_options[0]: # First option graph
+        avg_grade_bar_chart_new_window()
+        drop_down.set("File") # Set dropdown back to 'file' to make it look like a menu :)
+    elif drop_down.get() == menu_options[1]: # Exit option
+        exit(1)
+
+menu_options = ["Top performing countries graph","Exit"]
+drop_down = ttk.Combobox(menu_banner_frame, values = menu_options, state="readonly")
+drop_down.set("File")
+drop_down.pack(padx = 5,side = tk.LEFT)
+drop_down.bind("<<ComboboxSelected>>", drop_down_clicked)
+
+#ttk.Label(main_frame_left, background = 'green').pack(expand = True, fill = 'both')
+#ttk.Label(main_frame_centre, background = 'grey').pack(expand = True, fill = 'both')
+#ttk.Label(main_frame_right, background = 'blue').pack(expand = True, fill = 'both')
 
 # Left grid frames
 # Search Widgets
@@ -254,13 +267,12 @@ def avg_grade_bar_chart_new_window():
 
     # Many, many complex solutions or addons online, conflicts over solution. Went with iteration to keep items desired (online stated removing items could risk altering index order so safer to keep what you want than delete what you don't)
 
-    top_10_countries = {} # Adding to new dict is safer, as cannot change dict during iteration and index values may change
+    top_10_countries = {} # Adding to new dict is safer, as cannot change dict during iteration and index values may change as items are removed
     count = 0
     for x,y in l.items():
         if count < 10:
             top_10_countries[x]=y
         count += 1
-
 
     countries_x = top_10_countries.keys()
     grades_y = top_10_countries.values()
@@ -272,15 +284,12 @@ def avg_grade_bar_chart_new_window():
     plt.xlabel('Country')
     plt.ylabel('Grade')
 
-    plt.xticks(rotation=45)
+    plt.xticks(rotation=20)
     plt.tight_layout()
     bar_chart_canvas.draw()
 
-load_graph_button = tk.Button(main_frame_left_bottom,text ="Top performing countries", command = avg_grade_bar_chart_new_window)
-load_graph_button.pack(pady=20)
 
 # Middle search results frame
-#ttk.Label(main_frame_centre, background = 'orange').pack(expand = True, fill = 'both')
 
 
 # Setup all students table
@@ -536,7 +545,7 @@ main_frame_right_bottom.place(x = 0,rely = 0.66, relwidth = 1, relheight = 0.33)
 #ttk.Label(main_frame_right_middle, background = 'green').pack(expand = True, fill = 'both')
 #ttk.Label(main_frame_right_bottom, background = 'orange').pack(expand = True, fill = 'both')
 
-performance_summary = ttk.Label(main_frame_right_bottom, text='Select student ...')
+performance_summary = ttk.Label(main_frame_right_bottom, text='Select student ...',  foreground='Grey')
 performance_summary.pack()
 
 # Run UI
