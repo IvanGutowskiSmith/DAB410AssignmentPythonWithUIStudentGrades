@@ -1,14 +1,15 @@
-from tkinter.constants import DISABLED, NORMAL
-import pandas as pd # pd is alias, not needed but this is best practice
-import requests
 import tkinter as tk
-from tkinter import ttk
+from tkinter.constants import DISABLED, NORMAL
+from tkinter import ttk, constants  # UI elements
+import pandas as pd  # pd is alias, not needed but this is best practice
+import requests
+
 from PIL import Image, ImageTk
-from thefuzz import fuzz, process # For search result comparison
-from matplotlib import pyplot as plt # Generate table
+from thefuzz import fuzz, process  # For search result comparison
+from matplotlib import pyplot as plt  # Generate table
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-import statistics # Import pre-calculated statistics from statistics.py
+import statistics # Import pre-calculated statistics from statistics.py module
 
 
 # Import file

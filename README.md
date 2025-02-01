@@ -68,10 +68,31 @@ for the calculation logic: https://www.skillsyouneed.com/num/percent-change.html
 
 ## Running program
 # Prerequisites
+ - Pycharm IDE (Integrated Development Environment) installed
+ - Python 3.13 or greater installed, this can be found via the microsoft store or python.org https://www.python.org/downloads/
+ - Obtain the files for this application via Git clone or direct .zip download via GitHub, once extracted open the 
+'DAB410AssignmentPythonWithUIStudentGrades' folder with Pycharm
+   (IMAGE)
+
+Installing Python packages 
+There are various ways to install these packages, either individually via the Pycharm 'Packages' GUI and searching for each
+listed package.
+The easiest method is to open main.py within Pycharm, any missing package will be highlighted, use the context menu to install.
+(IMAGE)
+
+Alternatively using the terminal, each package can be installed using 'pip install {package name}' - excluding the curly braces.
+
+Note, if on a limited connection, these packages can exceed ~200MB
+Required packages
+- numpy
+- tkinter
+- pandas
+- requests
+- PIL (also known as 'Pillow')
+- thefuzz
+- matplotlib
 
 
-
-Troubleshooting
 
 
 
@@ -79,7 +100,7 @@ Troubleshooting
 
 -- Required modules: / Prerequisites
 
--- Latest python interpreter from Python.org or Windows store (Install this first as packages seem to need re-installing after version update)
+
 -- Pandas python package via pycharm, select latest version
 -- numpy also could mention to install via pip install
 pillow for images ?
