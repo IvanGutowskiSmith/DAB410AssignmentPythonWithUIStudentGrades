@@ -12,3 +12,6 @@ can just hover over import and select 'install all missing packages'
 
 -- need python3 interpreter downloaded and installed, restart pycharm after install
 -- Add pythern interpreter, add existing.
+
+
+MUST have file 'main.py' selected when pressing 'run', troubleshoot?
