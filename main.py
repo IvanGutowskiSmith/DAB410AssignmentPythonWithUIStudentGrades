@@ -310,15 +310,14 @@ def save_image_from_url(student_id, image_url):
 #Despite button being below student image in UI, we need button to exist in code before student image, so that logic can enable/disable the button
 def btn_generate_ai_student_image():
     # Predict gender from name
-
+    predicted_gender = 'all'
     try:
-        url = 'https://api.genderize.io?name=' + str(currently_selected_first_name)  # Not sure if required but ensured this was a string
+        url = 'https://api.genderize.io?name=' + str(currently_selected_first_name)
         response = requests.get(url)
         if response.status_code == 200:
             data = response.json()
             predicted_gender = data['gender']
-            print('Predicted gender for name: ' + currently_selected_first_name)
-            print(predicted_gender)
+            print('Predicted gender: ' + predicted_gender + ' for name: ' + currently_selected_first_name)
         else:
             print('could not get response from gender API') # TODO improve error handling
             return
@@ -363,12 +362,8 @@ def btn_generate_ai_student_image():
         return
     #
 
-
-
 generate_student_image_button = ttk.Button(main_frame_right_top, text = 'Generate student photo', command = btn_generate_ai_student_image, state=DISABLED)
 generate_student_image_button.pack(side = "bottom", pady = 5)
-
-
 
 student_image = None
 def update_student_image(student_id):
@@ -410,7 +405,7 @@ def student_performance_summary_text_update():
     new = float(currently_selected_grade) # Student grade
     original = float(average_grade_per_country[currently_selected_country]) # Average grade for their country
 
-    # Calculate student grade vs their country average. Used: https://www.skillsyouneed.com/num/percent-change.html
+    # Calculate student grade vs their country average. Used for mathematics reference: https://www.skillsyouneed.com/num/percent-change.html
     # New number - Original number
     difference = new - original
     # Divide increase by original number then x 100 | Negative = percentage decrease
@@ -490,7 +485,7 @@ main_frame_right_bottom.place(x = 0,rely = 0.66, relwidth = 1, relheight = 0.33)
 performance_summary = ttk.Label(main_frame_right_bottom, text='Select student ...',  foreground='Grey')
 performance_summary.pack()
 
-# Run UI
+# Run program
 root.mainloop()
 
 
