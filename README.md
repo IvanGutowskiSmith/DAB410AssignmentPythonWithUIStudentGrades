@@ -41,14 +41,14 @@ Country: Philippines
 
 
 ### 3. Stats Summary
-The left-hand pane lists an aggregated stastical summary of all imported student results.
+The left-hand pane lists an aggregated statistical summary of all imported student results.
 
 ### 4. Results Table
 Students can be selected by left-clicking the results table. The associated student is displayed in the 'Student Profile' pane. If multiple results are selected using SHIFT + Left Click, only the top result is displayed.
 
 ### 5. Student Image
 A placeholder image is displayed by default. When a student image is generated, it is saved to the `/StudentPhotos` folder under the student’s ID as a .jpg file.  
-To remove student images, delete them from this folder while ebsuring `placeholder.jpg` is not removed.
+To remove student images, delete them from this folder while ensuring `placeholder.jpg` is not removed.
 
 ### 6. Generate Student Photo
 The dataset does not include student gender. Therefore, an API request is made to `api.genderize.io` using the student’s first name. If gender is not available, "all" is used.  
