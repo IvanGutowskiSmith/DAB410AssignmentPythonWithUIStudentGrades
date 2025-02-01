@@ -32,29 +32,34 @@ By default, searches are conducted on:
 - country  
 
 Checkbox filters allow users to exclude speciffic columns from the search criteria. For example, searching for 'China' can exclude email to prevent results appearing for:
-`
+
 Student: 959
-Email: bghiraldimqm@china.com.cn
+
+Email: bghiraldimqm@**china**.com.cn
+
 Country: Philippines
-`
+
 
 ### 3. Stats Summary
-The left-hand pane lists an aggregated summary of all imported student results.
+The left-hand pane lists an aggregated stastical summary of all imported student results.
 
 ### 4. Results Table
 Students can be selected by left-clicking the results table. The associated student is displayed in the 'Student Profile' pane. If multiple results are selected using SHIFT + Left Click, only the top result is displayed.
 
 ### 5. Student Image
 A placeholder image is displayed by default. When a student image is generated, it is saved to the `/StudentPhotos` folder under the student’s ID as a .jpg file.  
-To remove student images, delete them from this folder while keeping `placeholder.jpg`.
+To remove student images, delete them from this folder while ebsuring `placeholder.jpg` is not removed.
 
 ### 6. Generate Student Photo
 The dataset does not include student gender. Therefore, an API request is made to `api.genderize.io` using the student’s first name. If gender is not available, "all" is used.  
-`
+
 For example:
+
 ID: 3
+
 Name: Wandis
-`
+Is not recognised by the genderize.io api, despite returning a 200 (success) status code the gender field will return 'none' 
+
 A second API request is made to `this-person-does-not-exist.com` with the predicted gender and age bracket. The generated image is saved in the studentPhotos folder previously mentioned.
 
 ### 7. Student Summary Table
@@ -79,10 +84,10 @@ Packages can be installed in multiple ways:
 - Open main.py, hover over missing imports, and use "Install package" from the context menu.
 ![image](https://github.com/user-attachments/assets/46bd3e73-b7d3-4884-b692-e9e8822101c6)
 
-- Run the following command for each missing package:
+- OR run the following command for each missing package:
 ```
 pip install package_name
 ```
 ## Running Program
-Within pycharm the `**main.py**` must be selected, then select run from the GUI.
+Within pycharm the **main.py** module must be selected, then click run from the GUI.
 ![image](https://github.com/user-attachments/assets/8b204d5a-1cb2-44e8-9121-2cf8499e2d7f)
