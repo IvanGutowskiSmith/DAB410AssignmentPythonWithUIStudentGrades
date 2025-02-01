@@ -317,16 +317,15 @@ def btn_generate_ai_student_image():
         if response.status_code == 200:
             data = response.json()
             predicted_gender = data['gender']
-            print('Predicted gender: ' + predicted_gender + ' for name: ' + currently_selected_first_name)
         else:
-            print('could not get response from gender API') # TODO improve error handling
+            print('could not get response from gender API')
             return
 
         if predicted_gender is None: # e.g. Student 3 'Wanids' fails gender prediction
             predicted_gender = 'all'
-            print('Gender not determined, defaulting to any')
+            print('Gender not determined, defaulting to all')
     except requests.exceptions.RequestException as e:
-        print("Error etching gender data"+ str(e))
+        print("Error fetching gender data"+ str(e))
 
     # Determine age bracket - None of the students are over 25, however logic will remain if required
     age = int(currently_selected_age)
@@ -358,7 +357,7 @@ def btn_generate_ai_student_image():
         save_image_from_url(currently_selected_student_id, ai_image_url)
         update_student_image(currently_selected_student_id)
     else:
-        print("could not obtain AI image") # TODO improve error handling
+        print("could not obtain AI image")
         return
     #
 
