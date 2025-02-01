@@ -34,7 +34,7 @@ By default, searches are conducted on:
 Checkbox filters allow users to exclude speciffic columns from the search criteria. For example, searching for 'China' can exclude email to prevent results appearing for:
 `
 Student: 959
-Email: bghiraldimqm@**china**.com.cn
+Email: bghiraldimqm@china.com.cn
 Country: Philippines
 `
 
