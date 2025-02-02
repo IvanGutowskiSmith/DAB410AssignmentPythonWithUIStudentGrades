@@ -1,11 +1,11 @@
 import tkinter as tk
 from tkinter.constants import DISABLED, NORMAL
-from tkinter import ttk, constants  # UI elements
+from tkinter import ttk  # UI elements
 import pandas as pd  # pd is alias, not needed but this is best practice
 import requests
 
 from PIL import Image, ImageTk
-from thefuzz import fuzz, process  # For search result comparison
+from thefuzz import fuzz  # For search result comparison
 from matplotlib import pyplot as plt  # Generate table
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
@@ -331,7 +331,7 @@ def btn_generate_ai_student_image():
     # Determine age bracket - None of the students are over 25, however logic will remain if required
     age = int(currently_selected_age)
 
-    age_bracket = 'all'
+    age_bracket = 'all' # Default value if no age is identified
     if age <= 18:
         age_bracket = '12-18'
     elif age <= 25:
@@ -373,11 +373,12 @@ def update_student_image(student_id):
         student_image.destroy()
         student_image = None
 
-    # Update student image: if not found add placeholder image and 'enable AI image' button
+    # Update student image: if not found add placeholder image and 'enable AI image' button.
+    # Have used a try / except here, however an 'if' statement may be more appropriate as it's not an error that a student has no image.
     try:
         image_original = Image.open('StudentPhotos\\' + str(student_id) + '.jpg').resize((200, 200))  # Double brackets is the size property, source Ai generated images are 1024x1024  1:1
         generate_student_image_button.config(state=DISABLED)
-    except:
+    except FileNotFoundError:
         print("could not find image, using placeholder")
         image_original = Image.open('StudentPhotos\\placeholder.jpg').resize((200, 200))
         generate_student_image_button.config(state=NORMAL)
@@ -451,7 +452,7 @@ def clicked_student_update_summary_table(_): # Underscore means we do not care a
     #Populate student summary table and save key values to global variables
     count = 0
     for row in row_data:
-        studentSummaryTable.insert(parent='', index=[count], values=(column_titles[count], row_data[count]))
+        studentSummaryTable.insert(parent='', index=count, values=(column_titles[count], row_data[count]))
         match column_titles[count]:
             case 'student_id':
                 currently_selected_student_id = row_data[count]
