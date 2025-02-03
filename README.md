@@ -17,8 +17,8 @@
 #### [How to contribute](#contributing)
 
 ## #program_overview
-This Python application provides a user interface for interpreting student data from a provided dataset `student_grades.csv` in the program root directory.  
-A summary of overall student statistics is provided, in addition, a search feature allows individual students to be identified.
+This Python application provides a user interface for interpreting student data from a provided dataset `student_grades.csv` located in the program root directory.  
+A summary of overall student statistics is provided, in addition, a search feature allows individual students to be viewed.
 
 ## #program_features
 ![image](https://github.com/user-attachments/assets/6ed99b46-c9b7-4363-910e-ef99fe8136b4)
@@ -27,7 +27,7 @@ A summary of overall student statistics is provided, in addition, a search featu
 The 'File' menu provides access to a bar chart. The information displayed is a collation of students by their country of birth and ranked by the top 10 with the highest average grade score.
 
 ### #2_search
-The central results table updates dynamically as the user enters a query. Less relevant results are removed when the system is highly confident in the match accuracy (100% fuzzy search match).  
+The central results table updates dynamically as the user enters a search query in the teext field located top left. Less relevant results are removed when the system is highly confident in the match accuracy (100% fuzzy search match).  
 By default, searches are conducted on:
 - student_id  
 - first_name  
@@ -62,7 +62,8 @@ For example:
 ID: 3
 
 Name: Wandis
-Is not recognised by the genderize.io api, despite returning a 200 (success) status code the gender field will return 'none' 
+
+Is not recognised by the genderize.io api. Despite returning a 200 (success) http status code the gender field will return 'none' 
 
 A second API request is made to `this-person-does-not-exist.com` with the predicted gender and age bracket. The generated image is saved in the studentPhotos folder previously mentioned.
 
@@ -70,7 +71,13 @@ A second API request is made to `this-person-does-not-exist.com` with the predic
 When selecting a student, their statistics appear in the right-hand pane. If values overflow their row, the application window can be resized for better viewing.
 
 ### #8_student_summary_text
-The student’s grade is compared with their country's average grade, displaying the percentage increase or decrease in a text summary.  
+The student’s grade is compared with their country's average grade, displaying the percentage increase or decrease in a text summary. Where student grade matches the average exactly, a positive summary is provided
+
+for example:
+
+ID: 884
+Mifinella
+
 Standard percentage calculation was referenced from: [skillsyouneed.com](https://www.skillsyouneed.com/num/percent-change.html).
 
 ## #9_running_program
@@ -107,7 +114,7 @@ Within pycharm the **main.py** module must be selected in addition to 'current f
 ![image](https://github.com/user-attachments/assets/8b204d5a-1cb2-44e8-9121-2cf8499e2d7f)
 
 ## #running_tests
-Unit tests are located in 'test_statistics.py' in this program's root directory. Loading via Pycharm, right-click blank space 
+Unit tests are located in 'test_statistics.py' in this program's root directory. Loading via Pycharm, right-click empty space 
 and select 'run python tests', a console output will display test results. 
 Having a line of test code selected will run that specific test and not the whole test suite.
 ![img.png](img.png)
