@@ -61,12 +61,15 @@ def avg_grade_bar_chart_new_window():
     bar_chart_canvas.get_tk_widget().pack()
     # Bar chart
     plt.style.use('fivethirtyeight')
-    # Order by highest grade, seems to make a list of tuples which is hard to process
-    l = dict(sorted(average_grade_per_country.items(),key=lambda x:x[1], reverse=True))
+
 
     # Due to the vast number of countries present, results would not easily display on a single bar chart. So have decided to list the top 10 countries by grade.
     # This requires ordering dictionary by grade, then selecting the top 10. Deleting (shrinking) dictionary whilst iterating caused errors and possible risk of IDs changing,
     #  so ordered by grade, then added top 10 to a new dictionary
+
+    # Order by highest grade, seems to make a list of tuples which is hard to process
+    l = dict(sorted(average_grade_per_country.items(),key=lambda x:x[1], reverse=True))
+
     top_10_countries = {} # New empty dictionary
     count = 0
     for x,y in l.items():
@@ -83,13 +86,13 @@ def avg_grade_bar_chart_new_window():
     plt.xlabel('Country')
     plt.ylabel('Grade')
 
-    plt.xticks(rotation=20) # Slanting country names on bottom axis for improved readability
+    plt.xticks(rotation=30) # Slanting country names on bottom axis for improved readability
     plt.tight_layout()
     bar_chart_canvas.draw()
 
 
 def search_student_event(event=None): # Triggered by search; 'none' is required to accept bindings from key release
-    value_to_search = left_menu_search_textEntry.get()  # Although used once, keeping the search result visible helps future debugging
+    value_to_search = left_menu_search_textEntry.get()  # Although variable only used once, keeping the search result visible helps future debugging
 
     rank_dict = {} # Create dictionary to store search similarity %
     highest_accuracy_value = 0 # Initialising variable, running total of highest score as results are iterated through
@@ -98,7 +101,7 @@ def search_student_event(event=None): # Triggered by search; 'none' is required 
     for indexValue, rows in data_frame.iterrows():
         key_stats_combined = str(rows["student_id"]) + rows["first_name"] + rows["last_name"] # Concatenate key column values into string variable
 
-        # Use checkboxes to determine if email and country are included in search scope, checked (1) by default, user can uncheck (0)
+        # Use checkboxes to determine if email and country are included in search scope, checked = 1 (default), unchecked = 0
         if filter_email_state.get() == 1: # Include eMail in search query
             key_stats_combined = key_stats_combined + rows["email"] # Append email to search string
         if filter_country_state.get() == 1: # Include country in search query
@@ -109,7 +112,7 @@ def search_student_event(event=None): # Triggered by search; 'none' is required 
         # Add studentId and similarity % to a dictionary
         rank_dict[str(rows["student_id"])] = similarity_value
 
-        # Record highest accuracy value
+        # Running record of highest accuracy value
         if similarity_value > highest_accuracy_value:
             highest_accuracy_value = similarity_value
 
@@ -120,7 +123,7 @@ def search_student_event(event=None): # Triggered by search; 'none' is required 
                 del rank_dict[stu_id]  # Remove any search results below 100% accuracy
 
     order_search_results = dict(sorted(rank_dict.items(), key=lambda x: x[1], reverse=True)) # Returns ordered dictionary of IDs to display in search results
-    students_list_table_update_on_search(order_search_results)
+    students_list_table_update_on_search(order_search_results) # Update search results table
 
 
 
@@ -132,9 +135,9 @@ def search_student_event(event=None): # Triggered by search; 'none' is required 
 root = tk.Tk()
 root.geometry('1280x720') # 16:9 aspect ratio that should fit on most screens
 root.minsize(1024,576)
-root.iconbitmap('favicon.ico') # System tray icon
+root.iconbitmap('favicon.ico') # Application and system tray icon
 root.title('Student Grade Manager. Student ID: 2310700') # Window title
-# Could define a style, however little improvement over default
+# Could define a style, however found little improvement over default
 
 # Main layout widgets
 menu_banner_frame = ttk.Frame(root)
@@ -295,11 +298,11 @@ students_list_table_add_all()
 
 
 ## Right frame
-# Right top frame
+# Right top frame - Student summary
 
 def save_image_from_url(student_id, image_url):
     destination_path = 'StudentPhotos\\' + str(student_id) + '.jpg'
-    response = requests.get(image_url)
+    response = requests.get(image_url) # Saves image from webpage URL obtained by API request
     if response.status_code == 200:
         with open(destination_path, 'wb') as file:
             file.write(response.content)
@@ -311,7 +314,7 @@ def save_image_from_url(student_id, image_url):
 #Despite button being below student image in UI, we need button to exist in code before student image, so that logic can enable/disable the button
 def btn_generate_ai_student_image():
     # Predict gender from name
-    predicted_gender = 'all'
+    predicted_gender = 'all' # Initialise variable and ensure default is set in-case of failure
     try:
         url = 'https://api.genderize.io?name=' + str(currently_selected_first_name)
         response = requests.get(url)
@@ -323,7 +326,7 @@ def btn_generate_ai_student_image():
             return
 
         if predicted_gender is None: # e.g. Student 3 'Wanids' fails gender prediction
-            predicted_gender = 'all'
+            predicted_gender = 'all' # On failure set to acceptable value
             print('Gender not determined, defaulting to all')
     except requests.exceptions.RequestException as e:
         print("Error fetching gender data"+ str(e))
@@ -331,7 +334,7 @@ def btn_generate_ai_student_image():
     # Determine age bracket - None of the students are over 25, however logic will remain if required
     age = int(currently_selected_age)
 
-    age_bracket = 'all' # Default value if no age is identified
+    age_bracket = 'all' # Initialise variable, default value set if no age is identified
     if age <= 18:
         age_bracket = '12-18'
     elif age <= 25:
@@ -343,7 +346,7 @@ def btn_generate_ai_student_image():
     else:
         age_bracket = '50' # request just states 50
 
-    print('Age bracket: ' + age_bracket)
+    print('Age bracket: ' + age_bracket) # Some console logging to show what's going on with the API requests
 
     # compose URL for ai image request
     url = 'https://this-person-does-not-exist.com/new?time=1737815809253&gender=' + str(predicted_gender) + '&age=' + age_bracket + '&etnic=all'
@@ -352,20 +355,22 @@ def btn_generate_ai_student_image():
 
     if response.status_code == 200:
         data = response.json()
+        # Extracts the file 'name' value from the API Json response and appends to URL for image download
         ai_image_url = 'https://this-person-does-not-exist.com/img/' + data['name']
 
         print("Ai image url: " + ai_image_url)
-        save_image_from_url(currently_selected_student_id, ai_image_url)
+        save_image_from_url(currently_selected_student_id, ai_image_url) # Save student image to local file system: /StudentPhotos
         update_student_image(currently_selected_student_id)
+
     else:
         print("could not obtain AI image")
         return
-    #
 
-generate_student_image_button = ttk.Button(main_frame_right_top, text = 'Generate student photo', command = btn_generate_ai_student_image, state=DISABLED)
-generate_student_image_button.pack(side = "bottom", pady = 5)
+# Setup button for student image, initial state is disabled till a student is selected
+generate_student_image_button = ttk.Button(main_frame_right_top, text='Generate student photo',command=btn_generate_ai_student_image,state=DISABLED)  # Disable image generation button as image will have been obtained
+generate_student_image_button.pack(side="bottom", pady=5)
 
-student_image = None
+student_image = None # Initialise variable
 def update_student_image(student_id):
     global student_image
     # Delete prior image if it exists
@@ -373,7 +378,7 @@ def update_student_image(student_id):
         student_image.destroy()
         student_image = None
 
-    # Update student image: if not found add placeholder image and 'enable AI image' button.
+    # Update student image: if not found add placeholder image and 'Generate student photo' button.
     # Have used a try / except here, however an 'if' statement may be more appropriate as it's not an error that a student has no image.
     try:
         image_original = Image.open('StudentPhotos\\' + str(student_id) + '.jpg').resize((200, 200))  # Double brackets is the size property, source Ai generated images are 1024x1024  1:1
@@ -398,7 +403,7 @@ currently_selected_first_name = ''
 currently_selected_age = 0
 currently_selected_country = ''
 currently_selected_grade = 0
-average_grade_per_country = statistics.average_country_grade(data_frame) # Empty dictionary
+average_grade_per_country = statistics.average_country_grade(data_frame)
 
 
 def student_performance_summary_text_update():
@@ -411,7 +416,7 @@ def student_performance_summary_text_update():
     difference = new - original
     # Divide increase by original number then x 100 | Negative = percentage decrease
     percent_difference = ( difference / original ) * 100
-    percent_difference = round(percent_difference,2) # Rounded on this line as the ',2' for rounding makes the calculation above confusing to read
+    percent_difference = round(percent_difference,2) # Rounding code on this line as the ',2' for rounding makes the calculation above confusing to read
     print(percent_difference)
 
     # Delete existing summary
@@ -430,7 +435,7 @@ def student_performance_summary_text_update():
 
 
 # Table row selection event
-def clicked_student_update_summary_table(_): # Underscore means we do not care abut the value
+def clicked_student_update_summary_table(_): # Underscore means we do not care abut the argument value
     global currently_selected_student_id
     global currently_selected_first_name
     global currently_selected_age

@@ -14,6 +14,7 @@
 #### [Installing Python Packages](#installing_python_packages)
 #### [Running Program](#running_program)
 #### [Running Tests](#running_tests)
+#### [How to contribute](#contributing)
 
 ## #program_overview
 This Python application provides a user interface for interpreting student data from a provided dataset `student_grades.csv` in the program root directory.  
@@ -99,7 +100,7 @@ Required packages:
 - PIL (Also known as 'Pillow')
 - thefuzz
 - matplotlib
-- pytest
+- pytest - whilst it may not require import, this adds a test runner UI to Pycharm
 
 ## #running_program
 Within pycharm the **main.py** module must be selected in addition to 'current file', then click run from the GUI.
@@ -110,3 +111,9 @@ Unit tests are located in 'test_statistics.py' in this program's root directory.
 and select 'run python tests', a console output will display test results. 
 Having a line of test code selected will run that specific test and not the whole test suite.
 ![img.png](img.png)
+
+## #contributing
+Whilst this code is available to view, download and obtain an understanding from. This project is part of a university
+assignment and should not be re-used in full or part by other students taking the same or similar course(s).
+
+There are no plans to develop this project further.
