@@ -1,4 +1,3 @@
-import pytest
 import pandas as pd
 from statistics import * # Import all the functions used by the main program
 
